@@ -1,8 +1,27 @@
+# Python caches
 __pycache__/
 *.py[cod]
 .pytest_cache/
-outputs/
-*.json
-tensorboard/
-data/
-psf/
+.mypy_cache/
+.ruff_cache/
+
+# Local datasets, PSFs, checkpoints, and experiment products
+/data/
+/outputs/
+/psf/
+/tensorboard/
+
+# Generated MATLAB assets
+/matlab_code/speckle_random_NA0.05/
+/matlab_code/psf_NA*.tif
+*.asv
+
+# Logs, temporary files, and local backups
+*.log
+*.orig
+*.tmp
+*~
+
+# Default benchmark reports written at the repository root
+/operator_benchmark.json
+/train_step_benchmark.json

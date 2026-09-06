@@ -1,7 +1,7 @@
 experiment:
   name: depth50_n100
   seed: 20260901
-  output_dir: outputs/depth50_n100
+  output_dir: outputs/depth50_n100_v2
 
 data:
   raw_tiff_path: data/分辨率图仿真/prepared/depth50_raw_100.tif
@@ -64,4 +64,5 @@ runtime:
   amp: false
   operator_mode: optimized
   operator_phase_chunk_size: 32
+  physics_use_checkpoint: true
   tensorboard: true

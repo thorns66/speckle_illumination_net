@@ -1,5 +1,11 @@
 # Variance-Anchored Self-Supervised Multi-Speckle LFM V1
 
+The original per-volume V1 path below remains available as the no_mean
+baseline. A separate shared multi-object, 10-frame-input/90-frame-constraint
+training path is now runnable; its frozen protocol, arbitrary 1--6 A40 GPU
+selection, resume, monitoring, and inference commands are documented in
+[`docs/multivolume_shared_training.md`](docs/multivolume_shared_training.md).
+
 This repository reconstructs one 3D volume at a time from multiple raw
 light-field speckle measurements. It is an untrained, per-volume optimization
 method, not supervised dataset training.
@@ -101,22 +107,29 @@ The existing `my_net` environment already contains the runtime dependencies.
 PYTHONPATH=. /home2/xyx/miniconda3/envs/my_net/bin/python inspect_psf.py \
   psf/NEW_modifyfobj_PSFmatrix_M4NA0.15MLPitch220fml4000OSR3chunk05from10to130zspacing14.6154Nnum49lambda532n1a0_-11b0_2.9333.mat
 
-PYTHONPATH=. /home2/xyx/miniconda3/envs/my_net/bin/python train_volume.py \
-  --config configs/v1_100_simulation.yaml --device cuda:0 --init random
+PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True PYTHONPATH=. python -u train_volume.py \
+  --config configs/depth50_n100_no_mean_loss.yaml --device cuda:0 --init random
 ```
+
+The production configuration is the variance-only (`no_mean`) objective. It keeps
+the mean reconstruction as an input feature but removes the mean data term
+from optimization (`lambda_mean: 0`).
 
 Warm start loads network weights but initializes beta from the new volume and
 does not load old optimizer momentum:
 
 ```bash
 PYTHONPATH=. /home2/xyx/miniconda3/envs/my_net/bin/python train_volume.py \
-  --config configs/v1_100_simulation.yaml --init checkpoint \
+  --config configs/depth50_n100_no_mean_loss.yaml --init checkpoint \
   --checkpoint outputs/previous_fov/checkpoint_best.pt
 ```
 
 `operator_mode: reference` is the literal loop implementation.
 `operator_mode: optimized` batches phases and uses differentiable FFT linear
 convolution. `operator_phase_chunk_size` trades memory for launch overhead.
+`physics_use_checkpoint: true` recomputes `H(g_hat)` and `H2(g_hat**2)` during
+backpropagation instead of retaining their FFT intermediates. This reduces
+peak GPU memory without changing the forward model or reconstruction target.
 
 The final reconstruction TIFF/NumPy volume, gate arrays/figures, MIPs, depth
 layers, metrics, and `checkpoint_best.pt` all refer to the same minimum-total-

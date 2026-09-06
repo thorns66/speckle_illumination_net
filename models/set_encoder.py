@@ -4,12 +4,13 @@ import torch
 from torch import Tensor, nn
 from torch.utils.checkpoint import checkpoint
 
-from .blocks import ConvBlock2D, ConvBlock3D
+from .blocks import ConvBlock2D, ConvBlock3D, blur_lateral_2d
 
 
 class SharedFrameEncoder(nn.Module):
-    def __init__(self, channels: tuple[int, int, int]) -> None:
+    def __init__(self, channels: tuple[int, int, int], *, anti_alias: bool = False) -> None:
         super().__init__()
+        self.anti_alias = bool(anti_alias)
         c0, c1, c2 = channels
         self.level0 = ConvBlock2D(1, c0)
         self.down1 = nn.Conv2d(c0, c1, 3, stride=2, padding=1)
@@ -19,8 +20,10 @@ class SharedFrameEncoder(nn.Module):
 
     def forward(self, frames: Tensor) -> tuple[Tensor, Tensor, Tensor]:
         level0 = self.level0(frames)
-        level1 = self.level1(self.down1(level0))
-        level2 = self.level2(self.down2(level1))
+        down1_input = blur_lateral_2d(level0) if self.anti_alias else level0
+        level1 = self.level1(self.down1(down1_input))
+        down2_input = blur_lateral_2d(level1) if self.anti_alias else level1
+        level2 = self.level2(self.down2(down2_input))
         return level0, level1, level2
 
 
@@ -34,6 +37,7 @@ class SetEncoder(nn.Module):
         frame_chunk_size: int = 8,
         z_scale_um: float = 100.0,
         use_checkpoint: bool = True,
+        anti_alias: bool = False,
     ) -> None:
         super().__init__()
         if len(channels) != 3:
@@ -44,7 +48,7 @@ class SetEncoder(nn.Module):
         self.frame_chunk_size = int(frame_chunk_size)
         self.z_scale_um = float(z_scale_um)
         self.use_checkpoint = bool(use_checkpoint)
-        self.shared = SharedFrameEncoder(self.channels)
+        self.shared = SharedFrameEncoder(self.channels, anti_alias=anti_alias)
         self.aggregate = nn.ModuleList(
             [nn.Conv2d(2 * channel, channel, 1) for channel in self.channels]
         )

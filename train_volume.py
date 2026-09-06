@@ -14,10 +14,15 @@ import numpy as np
 import torch
 import yaml
 
-from losses.self_supervised_losses import TaylorH2VarianceModel, compute_self_supervised_loss
+from losses.self_supervised_losses import (
+    TaylorH2VarianceModel,
+    compute_multiband_reliability,
+    compute_self_supervised_loss,
+)
 from models.variance_anchored_lfm_net import VarianceAnchoredLFMNet
 from physics.lfm_operator import LFMOperator
 from physics.psf_loader import load_psf
+from utils.axial_metrics import axial_lateral_metrics
 from utils.checkpoint import cpu_state_dict, load_model_checkpoint, save_checkpoint
 from utils.io import load_tiff_stack, load_volume_tiff, save_volume_tiff, select_frame_indices
 from utils.visualization import save_gate_outputs, save_loss_curve, save_volume_visualizations
@@ -54,10 +59,26 @@ def _model_from_config(config: dict[str, Any]) -> VarianceAnchoredLFMNet:
         positivity_eps=model.get("positivity_eps", 1e-8),
         z_scale_um=model["z_scale_um"],
         set_use_checkpoint=model.get("set_use_checkpoint", True),
+        set_encoder_type=model.get("set_encoder_type", "mean_std"),
+        set_transformer_heads=model.get("set_transformer_heads", 4),
+        set_transformer_inducing_points=model.get("set_transformer_inducing_points", 16),
+        set_transformer_layers=model.get("set_transformer_layers", 2),
+        use_role_separated_detail=model.get("use_role_separated_detail", False),
+        detail_lowpass_passes=model.get("detail_lowpass_passes", 2),
+        detail_lowpass_auxiliary_features=model.get("detail_lowpass_auxiliary_features", True),
+        detail_application=model.get("detail_application", "legacy_additive"),
+        detail_log_modulation_bound=model.get("detail_log_modulation_bound", 0.15),
+        network_context_pad_xy=model.get("network_context_pad_xy", 0),
+        network_context_pad_mode=model.get("network_context_pad_mode", "reflect"),
+        anti_alias_downsampling=model.get("anti_alias_downsampling", False),
+        coarse_application=model.get("coarse_application", "legacy_anchor_positive"),
+        coarse_log_residual_bound=model.get("coarse_log_residual_bound", 4.0),
         use_variance_branch=ablation["use_variance_branch"],
         use_mean_branch=ablation["use_mean_branch"],
         use_set_branch=ablation["use_set_branch"],
         use_gate=ablation["use_gate"],
+        lateral_log_residual_bound=model.get("lateral_log_residual_bound", 0.5),
+        axial_logit_scale=model.get("axial_logit_scale", 1.0),
         use_network_refinement=ablation.get("use_network_refinement", True),
     )
 
@@ -89,21 +110,44 @@ def _save_csv(path: Path, rows: list[dict[str, float]]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Per-volume variance-anchored LFM optimization")
-    parser.add_argument("--config", default="configs/v1_100_simulation.yaml")
+    parser.add_argument("--config", default="configs/depth50_n100_no_mean_loss.yaml")
     parser.add_argument("--device", default=None)
     parser.add_argument("--init", choices=("random", "checkpoint"), default="random")
     parser.add_argument("--checkpoint", default=None)
     parser.add_argument("--max-steps", type=int, default=None)
+    parser.add_argument("--output-dir", default=None)
+    parser.add_argument("--lateral-log-residual-bound", type=float, default=None)
+    parser.add_argument("--axial-logit-scale", type=float, default=None)
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
     config_path = Path(args.config).expanduser().resolve()
     with config_path.open("r", encoding="utf-8") as handle:
         config = yaml.safe_load(handle)
+    if args.output_dir is not None:
+        config["experiment"]["output_dir"] = args.output_dir
+    if args.lateral_log_residual_bound is not None:
+        config["model"]["lateral_log_residual_bound"] = args.lateral_log_residual_bound
+    if args.axial_logit_scale is not None:
+        config["model"]["axial_logit_scale"] = args.axial_logit_scale
     if args.device is not None:
         config["runtime"]["device"] = args.device
     if args.max_steps is not None:
         config["optimization"]["max_steps"] = args.max_steps
+    loss_options = dict(config["loss"])
+    band_gradient_ratio = float(loss_options.pop("var_band_gradient_ratio", 0.0))
+    band_levels = int(loss_options.pop("var_band_levels", 2))
+    band_reliability_threshold = float(
+        loss_options.pop("var_band_reliability_threshold", 0.5)
+    )
+    if band_gradient_ratio < 0.0:
+        raise ValueError("var_band_gradient_ratio must be nonnegative")
+    if band_levels < 1:
+        raise ValueError("var_band_levels must be positive")
+    if "lambda_var_band" in loss_options:
+        raise ValueError(
+            "Set var_band_gradient_ratio instead of a hand-tuned lambda_var_band"
+        )
     seed = int(config["experiment"]["seed"])
     _seed_everything(seed)
 
@@ -130,6 +174,19 @@ def main() -> None:
     raw = raw_all[frame_indices]
     measured_mean_np = raw.mean(axis=0, dtype=np.float64).astype(np.float32)
     measured_variance_np = raw.var(axis=0, ddof=1, dtype=np.float64).astype(np.float32)
+    split_variance_a_np: np.ndarray | None = None
+    split_variance_b_np: np.ndarray | None = None
+    if band_gradient_ratio > 0.0:
+        split_a = raw[0::2]
+        split_b = raw[1::2]
+        if min(split_a.shape[0], split_b.shape[0]) < 2:
+            raise ValueError("Multiband reliability requires at least four selected frames")
+        split_variance_a_np = split_a.var(
+            axis=0, ddof=1, dtype=np.float64
+        ).astype(np.float32)
+        split_variance_b_np = split_b.var(
+            axis=0, ddof=1, dtype=np.float64
+        ).astype(np.float32)
     residual_np = raw - measured_mean_np[None]
     del raw_all, raw
 
@@ -178,6 +235,31 @@ def main() -> None:
     measured_variance = torch.from_numpy(measured_variance_np)[None, None].to(device)
     z_tensor = torch.from_numpy(z_values).to(device)
 
+    band_weights: torch.Tensor | None = None
+    band_correlations: torch.Tensor | None = None
+    if band_gradient_ratio > 0.0:
+        assert split_variance_a_np is not None and split_variance_b_np is not None
+        split_variance_a = torch.from_numpy(split_variance_a_np)[None, None].to(device)
+        split_variance_b = torch.from_numpy(split_variance_b_np)[None, None].to(device)
+        band_weights, band_correlations = compute_multiband_reliability(
+            split_variance_a,
+            split_variance_b,
+            levels=band_levels,
+            log_eps=float(loss_options.get("var_log_eps", 1e-6)),
+            threshold=band_reliability_threshold,
+        )
+        if not bool((band_weights > 0).any().item()):
+            raise RuntimeError(
+                "No reproducible variance band passed the split-half threshold"
+            )
+        LOGGER.info(
+            "Split-half variance bands: correlations=%s weights=%s threshold=%.3f",
+            band_correlations.detach().cpu().tolist(),
+            band_weights.detach().cpu().tolist(),
+            band_reliability_threshold,
+        )
+        del split_variance_a, split_variance_b
+
     model = _model_from_config(config).to(device)
     warm = args.init == "checkpoint"
     if warm:
@@ -201,19 +283,73 @@ def main() -> None:
     best_reconstruction = None
     best_gates = None
     best_metrics: dict[str, float] = {}
+    active_parameter_count: int | None = None
     max_steps = int(config["optimization"]["max_steps"])
     save_every = int(config["optimization"]["save_every"])
     if max_steps < 1 or save_every < 1:
         raise ValueError("max_steps and save_every must both be positive")
+    band_lambda: float | None = 0.0 if band_gradient_ratio == 0.0 else None
+    band_initial_actual_ratio = 0.0
+    detail_start = int(config["model"].get("detail_ramp_start_step", 100))
+    detail_end = int(config["model"].get("detail_ramp_end_step", 200))
+    if detail_start < 0 or detail_end < detail_start:
+        raise ValueError("Detail ramp requires 0 <= start <= end")
+    freeze_step_value = config["model"].get("detail_freeze_backbone_step")
+    detail_freeze_backbone_step = (
+        None if freeze_step_value is None else int(freeze_step_value)
+    )
+    if detail_freeze_backbone_step is not None:
+        if not model.use_role_separated_detail:
+            raise ValueError("detail_freeze_backbone_step requires a detail branch")
+        if detail_freeze_backbone_step < 0:
+            raise ValueError("detail_freeze_backbone_step must be nonnegative")
+        if detail_start < detail_freeze_backbone_step:
+            raise ValueError(
+                "detail ramp must not begin before the backbone freeze step"
+            )
+
+    def detail_strength_at(step: int) -> float:
+        if not model.use_role_separated_detail:
+            return 0.0
+        if step < detail_start:
+            return 0.0
+        if detail_end <= detail_start:
+            return 1.0
+        return min(1.0, max(0.0, (step - detail_start) / (detail_end - detail_start)))
+
     amp_enabled = bool(config["runtime"]["amp"])
     if device.type == "cuda":
         torch.cuda.reset_peak_memory_stats(device)
 
     for step in range(max_steps):
         start_time = time.perf_counter()
+        if (
+            detail_freeze_backbone_step is not None
+            and step == detail_freeze_backbone_step
+        ):
+            for name, parameter in model.named_parameters():
+                if not name.startswith("detail_head."):
+                    parameter.requires_grad_(False)
+            trainable = sum(
+                parameter.numel() for parameter in model.parameters() if parameter.requires_grad
+            )
+            if trainable == 0:
+                raise RuntimeError("Backbone freeze left no trainable detail parameters")
+            LOGGER.info(
+                "Froze backbone and beta at step=%d; trainable_detail_parameters=%d",
+                step,
+                trainable,
+            )
         optimizer.zero_grad(set_to_none=True)
+        detail_strength = detail_strength_at(step)
         with torch.autocast(device_type=device.type, enabled=amp_enabled):
-            output = model(f_var, g_mean, residual_frames, z_tensor)
+            output = model(
+                f_var,
+                g_mean,
+                residual_frames,
+                z_tensor,
+                detail_strength=detail_strength,
+            )
         reconstruction_physics = output.reconstruction.to(dtype=operator.H.dtype)
         losses = compute_self_supervised_loss(
             reconstruction_physics,
@@ -221,8 +357,49 @@ def main() -> None:
             measured_variance,
             operator,
             variance_model,
-            **config["loss"],
+            physics_use_checkpoint=bool(
+                config["runtime"].get("physics_use_checkpoint", False)
+            ),
+            lambda_var_band=1.0 if band_lambda is None else band_lambda,
+            var_band_levels=band_levels,
+            var_band_weights=band_weights,
+            **loss_options,
         )
+        if band_lambda is None:
+            base_gradient = torch.autograd.grad(
+                losses.normalized_var,
+                reconstruction_physics,
+                retain_graph=True,
+            )[0]
+            band_gradient = torch.autograd.grad(
+                losses.var_band,
+                reconstruction_physics,
+                retain_graph=True,
+            )[0]
+            base_norm = float(torch.linalg.vector_norm(base_gradient).detach().item())
+            band_norm = float(torch.linalg.vector_norm(band_gradient).detach().item())
+            if not np.isfinite(base_norm) or not np.isfinite(band_norm) or band_norm <= 0.0:
+                raise FloatingPointError(
+                    "Cannot calibrate multiband loss from non-finite or zero gradients"
+                )
+            band_lambda = band_gradient_ratio * base_norm / max(band_norm, 1e-12)
+            band_initial_actual_ratio = band_lambda * band_norm / max(base_norm, 1e-12)
+            losses.weighted_var_band = band_lambda * losses.var_band
+            losses.total = (
+                losses.weighted_mean
+                + losses.weighted_var
+                + losses.weighted_var_band
+                + losses.weighted_tv
+            )
+            LOGGER.info(
+                "Calibrated multiband loss: target_gradient_ratio=%.4g "
+                "base_grad=%.6g band_grad=%.6g lambda=%.6g actual_ratio=%.6g",
+                band_gradient_ratio,
+                base_norm,
+                band_norm,
+                band_lambda,
+                band_initial_actual_ratio,
+            )
         if not torch.isfinite(losses.total):
             raise FloatingPointError(f"Non-finite total loss at step {step}")
         metrics = losses.scalar_metrics()
@@ -234,8 +411,25 @@ def main() -> None:
                 "alpha1": float(output.alphas[1].detach().item()),
                 "alpha2": float(output.alphas[2].detach().item()),
                 "learning_rate": float(optimizer.param_groups[0]["lr"]),
+                "lambda_var_band": float(band_lambda),
+                "var_band_gradient_ratio_target": band_gradient_ratio,
+                "var_band_gradient_ratio_initial": band_initial_actual_ratio,
+                "detail_strength": detail_strength,
+                "backbone_frozen": float(
+                    detail_freeze_backbone_step is not None
+                    and step >= detail_freeze_backbone_step
+                ),
             }
         )
+        metrics.update(axial_lateral_metrics(output, z_values))
+        if band_weights is not None and band_correlations is not None:
+            for band_index in range(band_levels):
+                metrics[f"var_band_weight_{band_index}"] = float(
+                    band_weights[band_index].detach().item()
+                )
+                metrics[f"var_band_correlation_{band_index}"] = float(
+                    band_correlations[band_index].detach().item()
+                )
         if metrics["total_loss"] < best_total:
             best_total = metrics["total_loss"]
             best_step = step
@@ -247,6 +441,10 @@ def main() -> None:
         for parameter in model.parameters():
             if parameter.grad is not None and not torch.isfinite(parameter.grad).all():
                 raise FloatingPointError(f"Non-finite model gradient at step {step}")
+        if active_parameter_count is None:
+            active_parameter_count = sum(
+                parameter.numel() for parameter in model.parameters() if parameter.grad is not None
+            )
         optimizer.step()
         if device.type == "cuda":
             torch.cuda.synchronize(device)
@@ -262,13 +460,20 @@ def main() -> None:
         if step % save_every == 0 or step == max_steps - 1:
             snapshot = output.reconstruction.detach().cpu().numpy()[0, 0]
             save_volume_tiff(output_dir / f"reconstruction_step_{step:04d}.tif", snapshot)
+            if output.axial_mass_fraction is not None:
+                np.save(
+                    output_dir / f"axial_mass_step_{step:04d}.npy",
+                    output.axial_mass_fraction.detach().cpu().numpy()[0, 0, :, 0, 0],
+                )
             _save_csv(output_dir / "losses.csv", rows)
         LOGGER.info(
-            "step=%d total=%.6g mean=%.6g var=%.6g beta=%.4g time=%.3fs",
+            "step=%d total=%.6g mean=%.6g var=%.6g band=%.6g detail=%.3f beta=%.4g time=%.3fs",
             step,
             metrics["total_loss"],
             metrics["normalized_mean_loss"],
             metrics["normalized_var_loss"],
+            metrics["weighted_var_band_loss"],
+            metrics["detail_strength"],
             metrics["beta"],
             metrics["step_time_s"],
         )
@@ -298,6 +503,31 @@ def main() -> None:
         "best_var_loss": best_metrics["normalized_var_loss"],
         "best_metrics": best_metrics,
         "artifact_source_step": best_step,
+        "set_encoder_type": model.set_encoder_type,
+        "use_role_separated_detail": model.use_role_separated_detail,
+        "detail_application": model.detail_application,
+        "detail_log_modulation_bound": model.detail_log_modulation_bound,
+        "network_context_pad_xy": model.network_context_pad_xy,
+        "network_context_pad_mode": model.network_context_pad_mode,
+        "anti_alias_downsampling": model.anti_alias_downsampling,
+        "coarse_application": model.coarse_application,
+        "coarse_log_residual_bound": model.coarse_log_residual_bound,
+        "lateral_log_residual_bound": model.lateral_log_residual_bound,
+        "axial_logit_scale": model.axial_logit_scale,
+        "detail_freeze_backbone_step": detail_freeze_backbone_step,
+        "var_band_gradient_ratio_target": band_gradient_ratio,
+        "lambda_var_band": float(band_lambda),
+        "var_band_weights": (
+            None if band_weights is None else band_weights.detach().cpu().tolist()
+        ),
+        "var_band_correlations": (
+            None
+            if band_correlations is None
+            else band_correlations.detach().cpu().tolist()
+        ),
+        "registered_parameter_count": sum(parameter.numel() for parameter in model.parameters()),
+        "active_parameter_count": active_parameter_count,
+        "ablation": dict(config["ablation"]),
     }
     with (output_dir / "metrics.json").open("w", encoding="utf-8") as handle:
         json.dump(summary, handle, indent=2)

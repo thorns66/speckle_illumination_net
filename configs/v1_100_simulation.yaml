@@ -64,4 +64,5 @@ runtime:
   amp: false
   operator_mode: optimized
   operator_phase_chunk_size: 32
+  physics_use_checkpoint: true
   tensorboard: true

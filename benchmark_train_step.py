@@ -8,6 +8,7 @@ from pathlib import Path
 
 import torch
 import yaml
+from torch.utils.checkpoint import checkpoint
 
 from losses.self_supervised_losses import TaylorH2VarianceModel
 from physics.lfm_operator import LFMOperator
@@ -72,13 +73,31 @@ def main() -> None:
     z_values = torch.tensor(psf_config["z_values_um"], device=device)
     measured_mean = torch.rand((1, 1, args.height, args.width), device=device)
     variance_model = TaylorH2VarianceModel(operator, **config["noise"])
+    physics_use_checkpoint = bool(config["runtime"].get("physics_use_checkpoint", False))
     model.initialize_beta(f_var, measured_mean, operator)
     if device.type == "cuda":
         torch.cuda.reset_peak_memory_stats(device)
     total_start = time.perf_counter()
     output, network_time = timed(lambda: model(f_var, g_mean, residual, z_values), device)
-    pred_mean, h_time = timed(lambda: operator(output.reconstruction), device)
-    pred_var, h2_time = timed(lambda: variance_model(output.reconstruction, measured_mean), device)
+    if physics_use_checkpoint:
+        mean_function = lambda: checkpoint(
+            operator,
+            output.reconstruction,
+            use_reentrant=False,
+            preserve_rng_state=False,
+        )
+        variance_function = lambda: checkpoint(
+            variance_model,
+            output.reconstruction,
+            measured_mean,
+            use_reentrant=False,
+            preserve_rng_state=False,
+        )
+    else:
+        mean_function = lambda: operator(output.reconstruction)
+        variance_function = lambda: variance_model(output.reconstruction, measured_mean)
+    pred_mean, h_time = timed(mean_function, device)
+    pred_var, h2_time = timed(variance_function, device)
     loss = pred_mean.mean() + pred_var.mean() + output.reconstruction.mean() * 1e-5
     _, backward_time = timed(lambda: loss.backward(), device)
     _, optimizer_time = timed(lambda: optimizer.step(), device)
@@ -88,6 +107,7 @@ def main() -> None:
         "volume_shape": list(shape),
         "num_frames": args.frames,
         "toy_psf": args.toy,
+        "physics_use_checkpoint": physics_use_checkpoint,
         "network_forward_s": network_time,
         "H_forward_s": h_time,
         "H2_forward_s": h2_time,
