@@ -81,9 +81,17 @@ def _worker(args: argparse.Namespace) -> None:
         config, synthetic_config_path, device, selected_h_cache=psf_cache
     )
 
-    raw = load_inference_input(args.sample_dir, args.subset)
+    var_feature_representation = config["data"].get(
+        "var_feature_representation", "sqrt"
+    )
+    raw = load_inference_input(
+        args.sample_dir,
+        args.subset,
+        var_feature_representation=var_feature_representation,
+    )
     tensor_names = {
         "f_var",
+        "f_var_feature",
         "g_mean",
         "input_mean",
         "residual_frames",
@@ -102,6 +110,7 @@ def _worker(args: argparse.Namespace) -> None:
             item["g_mean"],
             item["residual_frames"],
             item["z_values_um"],
+            var_feature_volume=item["f_var_feature"],
             beta0=beta0,
         )
     reconstruction = output.reconstruction[0, 0].float().cpu().numpy()
@@ -110,6 +119,7 @@ def _worker(args: argparse.Namespace) -> None:
     np.save(destination / "reconstruction.npy", reconstruction)
     save_volume_tiff(destination / "reconstruction.tif", reconstruction)
     np.save(destination / "input_f_var.npy", raw["f_var"][0])
+    np.save(destination / "input_f_var_feature.npy", raw["f_var_feature"][0])
     np.save(destination / "input_g_mean.npy", raw["g_mean"][0])
     record = {
         "checkpoint": str(checkpoint_path),
@@ -120,6 +130,7 @@ def _worker(args: argparse.Namespace) -> None:
         "subset_index": int(raw["subset_index"]),
         "input_frame_indices_one_based": np.asarray(raw["input_indices"]).tolist(),
         "target_or_ground_truth_read": False,
+        "var_feature_representation": var_feature_representation,
         "physical_gpu": os.environ["SPECKLE_PHYSICAL_GPUS"],
         "beta0": float(beta0.item()),
         "beta": float(output.beta.item()),

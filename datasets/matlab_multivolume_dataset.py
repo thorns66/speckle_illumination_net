@@ -12,13 +12,12 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
+from utils.dataset_splits import LEGACY_SPLITS, expected_splits
+
 
 EXPECTED_Z_UM = np.arange(10, 101, 10, dtype=np.float32)
-EXPECTED_SPLITS = {
-    "train": ("P01", "P02", "P03", "P04", "P05", "P06", "P08", "P10"),
-    "validation": ("P09", "V01", "V02"),
-    "test": ("P07", "T01", "T02"),
-}
+EXPECTED_SPLITS = LEGACY_SPLITS  # Compatibility for callers of the v2 constant.
+VAR_FEATURE_REPRESENTATIONS = {"sqrt", "raw"}
 
 
 @dataclass(frozen=True)
@@ -72,18 +71,30 @@ def load_dataset_index(root: str | Path) -> tuple[dict[str, list[DatasetItemKey]
     final = json.loads(final_path.read_text(encoding="utf-8"))
     if not splits.get("dataset_complete") or not final.get("complete"):
         raise ValueError("Dataset manifests do not declare a complete dataset")
+    version = splits.get("version", 2)
+    expected = expected_splits(version)
+    if version == 3 and final.get("version") != 3:
+        raise ValueError("V3 final and split manifest revisions disagree")
     final_map = {item["sample_id"]: item for item in final["samples"]}
     split_map = {item["sample_id"]: item for item in splits["samples"]}
+    if len(final_map) != len(final["samples"]) or len(split_map) != len(splits["samples"]):
+        raise ValueError("Duplicate object IDs in dataset manifests")
     if set(final_map) != set(split_map):
         raise ValueError("Final and split manifests contain different objects")
-    actual: dict[str, list[str]] = {name: [] for name in EXPECTED_SPLITS}
-    indexed: dict[str, list[DatasetItemKey]] = {name: [] for name in EXPECTED_SPLITS}
+    actual: dict[str, list[str]] = {name: [] for name in expected}
+    indexed: dict[str, list[DatasetItemKey]] = {name: [] for name in expected}
     signature_paths = [split_path, final_path]
     for sample_id, item in split_map.items():
         split = str(item["split"])
         if split not in indexed:
             raise ValueError(f"Unsupported split {split!r} for {sample_id}")
         sample_dir = root / sample_id
+        if version == 3 and (
+            final_map[sample_id]["split"] != split
+            or item.get("object_group_id") != sample_id
+            or Path(item["sample_dir"]).resolve() != sample_dir
+        ):
+            raise ValueError(f"Inconsistent V3 owner, split or path for {sample_id}")
         if Path(final_map[sample_id]["sample_dir"]).resolve() != sample_dir:
             raise ValueError(f"{sample_id} points outside the unified dataset root")
         validation = sample_dir / "validation_manifest.json"
@@ -93,6 +104,12 @@ def load_dataset_index(root: str | Path) -> tuple[dict[str, list[DatasetItemKey]
         validation_record = json.loads(validation.read_text(encoding="utf-8"))
         if not validation_record.get("complete"):
             raise ValueError(f"{sample_id} has not passed MATLAB validation")
+        if version == 3 and (
+            validation_record.get("sample_id") != sample_id
+            or validation_record.get("frame_count") != 100
+            or validation_record.get("subset_count") != 10
+        ):
+            raise ValueError(f"Invalid V3 validation counts/owner for {sample_id}")
         actual[split].append(sample_id)
         signature_paths.extend((validation, prepared))
         for subset_index in range(1, 11):
@@ -101,16 +118,26 @@ def load_dataset_index(root: str | Path) -> tuple[dict[str, list[DatasetItemKey]
                 raise FileNotFoundError(subset_path)
             signature_paths.append(subset_path)
             indexed[split].append(DatasetItemKey(sample_id, subset_index, split, sample_dir))
-        signature_paths.extend(sorted((sample_dir / "sensor_frames").glob("frame_*.mat")))
-    for split, expected in EXPECTED_SPLITS.items():
-        if tuple(actual[split]) != expected:
+        frame_paths = sorted((sample_dir / "sensor_frames").glob("frame_*.mat"))
+        if version == 3 and [p.name for p in frame_paths] != [f"frame_{i:03d}.mat" for i in range(1, 101)]:
+            raise ValueError(f"{sample_id} lacks its exact 100-frame inventory")
+        signature_paths.extend(frame_paths)
+    for split, objects in expected.items():
+        if tuple(actual[split]) != objects:
             raise ValueError(
-                f"Authoritative {split} split is {actual[split]}, expected {list(expected)}"
+                f"Authoritative {split} split is {actual[split]}, expected {list(objects)}"
             )
     return indexed, _source_signature(signature_paths)
 
 
-def _read_input(key: DatasetItemKey) -> dict[str, Any]:
+def _read_input(
+    key: DatasetItemKey, *, var_feature_representation: str = "sqrt"
+) -> dict[str, Any]:
+    if var_feature_representation not in VAR_FEATURE_REPRESENTATIONS:
+        raise ValueError(
+            "var_feature_representation must be 'sqrt' or 'raw', "
+            f"got {var_feature_representation!r}"
+        )
     subset_path = key.sample_dir / "subsets" / f"subset_{key.subset_index:02d}.mat"
     with h5py.File(subset_path, "r") as handle:
         sample_id = "".join(chr(int(v)) for v in handle["sample_id"][()].reshape(-1))
@@ -123,6 +150,12 @@ def _read_input(key: DatasetItemKey) -> dict[str, Any]:
         z_um = _vector(handle["z_um"], np.float32)
         g_mean = _matlab_yxz_to_zyx(handle["physics_mean_raw"]).astype(np.float32)
         f_var = _matlab_yxz_to_zyx(handle["physics_taylor_sqrt_float"]).astype(np.float32)
+        if var_feature_representation == "raw":
+            f_var_feature = _matlab_yxz_to_zyx(handle["physics_taylor_raw"]).astype(
+                np.float32
+            )
+        else:
+            f_var_feature = f_var
         input_mean = _matlab_yx_to_yx(handle["input_physics_mean_float"]).astype(np.float32)
     if input_indices.shape != (10,) or holdout_indices.shape != (90,):
         raise ValueError(f"{subset_path} is not a 10/90 split")
@@ -145,6 +178,7 @@ def _read_input(key: DatasetItemKey) -> dict[str, Any]:
     residual_frames = input_frames - input_mean[None]
     for name, value in {
         "f_var": f_var,
+        "f_var_feature": f_var_feature,
         "g_mean": g_mean,
         "input_mean": input_mean,
         "input_frames": input_frames,
@@ -157,6 +191,7 @@ def _read_input(key: DatasetItemKey) -> dict[str, Any]:
         "input_indices": input_indices,
         "z_values_um": z_um,
         "f_var": f_var[None],
+        "f_var_feature": f_var_feature[None],
         "g_mean": g_mean[None],
         "input_mean": input_mean[None],
         "residual_frames": residual_frames[:, None],
@@ -191,10 +226,15 @@ def _read_targets(
     return result
 
 
-def load_inference_input(sample_dir: str | Path, subset_index: int) -> dict[str, Any]:
+def load_inference_input(
+    sample_dir: str | Path,
+    subset_index: int,
+    *,
+    var_feature_representation: str = "sqrt",
+) -> dict[str, Any]:
     sample_dir = Path(sample_dir).expanduser().resolve()
     key = DatasetItemKey(sample_dir.name, int(subset_index), "inference", sample_dir)
-    return _read_input(key)
+    return _read_input(key, var_feature_representation=var_feature_representation)
 
 
 class MatlabMultiVolumeDataset(Dataset[dict[str, Any]]):
@@ -205,6 +245,7 @@ class MatlabMultiVolumeDataset(Dataset[dict[str, Any]]):
         *,
         cache_dir: str | Path | None = None,
         include_ground_truth: bool | None = None,
+        var_feature_representation: str = "sqrt",
     ) -> None:
         self.root = Path(root).expanduser().resolve()
         indexed, self.dataset_fingerprint = load_dataset_index(self.root)
@@ -213,6 +254,12 @@ class MatlabMultiVolumeDataset(Dataset[dict[str, Any]]):
         self.split = split
         self.keys = indexed[split]
         self.cache_dir = None if cache_dir is None else Path(cache_dir).expanduser().resolve()
+        if var_feature_representation not in VAR_FEATURE_REPRESENTATIONS:
+            raise ValueError(
+                "var_feature_representation must be 'sqrt' or 'raw', "
+                f"got {var_feature_representation!r}"
+            )
+        self.var_feature_representation = var_feature_representation
         self.include_ground_truth = split != "train" if include_ground_truth is None else bool(
             include_ground_truth
         )
@@ -225,22 +272,32 @@ class MatlabMultiVolumeDataset(Dataset[dict[str, Any]]):
     def _cache_path(self, key: DatasetItemKey) -> Path:
         assert self.cache_dir is not None
         gt_mode = "eval_gt" if self.include_ground_truth else "train_nogt"
-        return self.cache_dir / self.dataset_fingerprint[:16] / key.split / gt_mode / (
-            f"{key.sample_id}_subset_{key.subset_index:02d}.npz"
+        feature_mode = f"var_feature_{self.var_feature_representation}"
+        return (
+            self.cache_dir
+            / self.dataset_fingerprint[:16]
+            / feature_mode
+            / key.split
+            / gt_mode
+            / f"{key.sample_id}_subset_{key.subset_index:02d}.npz"
         )
 
     def _load_numpy(self, index: int) -> dict[str, Any]:
         key = self.keys[index]
         if self.cache_dir is None:
             return {
-                **_read_input(key),
+                **_read_input(
+                    key, var_feature_representation=self.var_feature_representation
+                ),
                 **_read_targets(key, include_ground_truth=self.include_ground_truth),
             }
         cache_path = self._cache_path(key)
         if not cache_path.is_file():
             cache_path.parent.mkdir(parents=True, exist_ok=True)
             item = {
-                **_read_input(key),
+                **_read_input(
+                    key, var_feature_representation=self.var_feature_representation
+                ),
                 **_read_targets(key, include_ground_truth=self.include_ground_truth),
             }
             temporary = cache_path.with_suffix(f".tmp-{os.getpid()}.npz")
@@ -259,7 +316,7 @@ class MatlabMultiVolumeDataset(Dataset[dict[str, Any]]):
     def __getitem__(self, index: int) -> dict[str, Any]:
         item = self._load_numpy(index)
         tensor_names = {
-            "f_var", "g_mean", "input_mean", "residual_frames",
+            "f_var", "f_var_feature", "g_mean", "input_mean", "residual_frames",
             "measured_mean", "measured_variance", "ground_truth", "z_values_um",
         }
         return {

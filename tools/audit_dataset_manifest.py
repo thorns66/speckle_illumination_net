@@ -6,12 +6,10 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+from utils.dataset_splits import LEGACY_SPLITS, expected_splits
 
-EXPECTED_SPLITS = {
-    "train": ["P01", "P02", "P03", "P04", "P05", "P06", "P08", "P10"],
-    "validation": ["P09", "V01", "V02"],
-    "test": ["P07", "T01", "T02"],
-}
+
+EXPECTED_SPLITS = {k: list(v) for k, v in LEGACY_SPLITS.items()}
 MUTABLE_METADATA = {
     "validation_manifest.mat",
     "validation_manifest.json",
@@ -33,19 +31,32 @@ def _allowed_unhashed(relative: str) -> bool:
     return portable in MUTABLE_METADATA or portable.startswith("logs/")
 
 
-def audit(root: Path, workers: int) -> dict[str, object]:
+def audit(
+    root: Path, workers: int, *, split_record=None, final_record=None
+) -> dict[str, object]:
     root = root.expanduser().resolve()
-    split_record = json.loads((root / "dataset_splits.json").read_text(encoding="utf-8"))
-    final_record = json.loads(
-        (root / "FINAL_DATASET_MANIFEST.json").read_text(encoding="utf-8")
-    )
+    if split_record is None:
+        split_record = json.loads(
+            (root / "dataset_splits.json").read_text(encoding="utf-8")
+        )
+    if final_record is None:
+        final_record = json.loads(
+            (root / "FINAL_DATASET_MANIFEST.json").read_text(encoding="utf-8")
+        )
     if not split_record.get("dataset_complete") or not final_record.get("complete"):
         raise ValueError("Dataset is not declared complete")
-    actual_splits = {
-        split: [item["sample_id"] for item in split_record["samples"] if item["split"] == split]
-        for split in EXPECTED_SPLITS
+    expected = {
+        k: list(v) for k, v in expected_splits(split_record.get("version", 2)).items()
     }
-    if actual_splits != EXPECTED_SPLITS:
+    actual_splits = {
+        split: [
+            item["sample_id"]
+            for item in split_record["samples"]
+            if item["split"] == split
+        ]
+        for split in expected
+    }
+    if actual_splits != expected:
         raise ValueError(f"Unexpected object splits: {actual_splits}")
 
     jobs: list[tuple[str, Path, int, str]] = []
@@ -68,11 +79,14 @@ def audit(root: Path, workers: int) -> dict[str, object]:
             coverage_errors.append(f"{sample_id}: duplicate artifact paths")
         forbidden = sorted(path for path in declared if _allowed_unhashed(path))
         if forbidden:
-            coverage_errors.append(f"{sample_id}: mutable paths were hashed: {forbidden[:3]}")
+            coverage_errors.append(
+                f"{sample_id}: mutable paths were hashed: {forbidden[:3]}"
+            )
         actual = {
             path.relative_to(sample_dir).as_posix()
             for path in sample_dir.rglob("*")
-            if path.is_file() and not _allowed_unhashed(path.relative_to(sample_dir).as_posix())
+            if path.is_file()
+            and not _allowed_unhashed(path.relative_to(sample_dir).as_posix())
         }
         missing_coverage = sorted(actual - declared)
         stale_declarations = sorted(declared - actual)
@@ -87,7 +101,9 @@ def audit(root: Path, workers: int) -> dict[str, object]:
         sample_counts[sample_id] = len(artifacts)
         for item in artifacts:
             relative = item["relative_path"].replace("\\", "/")
-            jobs.append((sample_id, sample_dir / relative, int(item["bytes"]), item["sha256"]))
+            jobs.append(
+                (sample_id, sample_dir / relative, int(item["bytes"]), item["sha256"])
+            )
 
     def verify(job: tuple[str, Path, int, str]) -> str | None:
         sample_id, path, expected_bytes, expected_hash = job
@@ -100,7 +116,9 @@ def audit(root: Path, workers: int) -> dict[str, object]:
         return None
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
-        hash_errors = [error for error in executor.map(verify, jobs) if error is not None]
+        hash_errors = [
+            error for error in executor.map(verify, jobs) if error is not None
+        ]
     errors = coverage_errors + hash_errors
     return {
         "complete": not errors,
@@ -114,7 +132,9 @@ def audit(root: Path, workers: int) -> dict[str, object]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Verify the complete MATLAB dataset manifests")
+    parser = argparse.ArgumentParser(
+        description="Verify the complete MATLAB dataset manifests"
+    )
     parser.add_argument("--root", default="data/matlab_cells_pilot_v2_r04")
     parser.add_argument("--workers", type=int, default=6)
     parser.add_argument("--output")

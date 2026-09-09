@@ -1,5 +1,7 @@
 # Variance-Anchored Self-Supervised Multi-Speckle LFM V1
 
+> **当前基线已更新为 E3＋100% mean 结构梯度上限，默认使用第 400 步 final。** 详见 [当前基线记录](CURRENT_BASELINE.md) 和 [模型及来源清单](CURRENT_BASELINE.json)。下文保留历史架构说明；其中旧的“当前基线/正式基线”表述以该记录为准。
+
 The original per-volume V1 path below remains available as the no_mean
 baseline. A separate shared multi-object, 10-frame-input/90-frame-constraint
 training path is now runnable; its frozen protocol, arbitrary 1--6 A40 GPU

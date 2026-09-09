@@ -1,0 +1,76 @@
+experiment:
+  name: multivolume_n10_raw_var_feature
+  seed: 20260901
+  output_dir: outputs/multivolume_n10_raw_var_feature
+
+data:
+  root: data/matlab_cells_pilot_v2_r04
+  split_manifest: dataset_splits.json
+  stream: physics
+  input_frames: 10
+  target_frames: 90
+  subset_policy: frozen_subsets
+  var_feature_representation: raw
+  cache_dir: data/.cache/matlab_multivolume_n10_raw_var_feature
+  precompute_cache: true
+
+psf:
+  H_path: psf/NEW_modifyfobj_PSFmatrix_M4NA0.15MLPitch220fml4000OSR3chunk05from10to130zspacing14.6154Nnum49lambda532n1a0_-11b0_2.9333.mat
+  H_variable_name: H
+  Ht_variable_name: Ht
+  psf_z_all_um: null
+  z_values_um: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+  depth_unit: auto
+
+noise:
+  alpha_noise: 0.0
+  sigma_read: 0.0
+
+model:
+  var_channels: [16, 32, 64]
+  mean_channels: [16, 32, 64]
+  set_channels: [8, 16, 32]
+  decoder_channels: [16, 32, 64]
+  set_encoder_type: mean_std
+  set_frame_chunk_size: 8
+  set_use_checkpoint: true
+  alpha_init: 0.05
+  beta_range: 0.2
+  beta_mode: input10_analytic_base_shared_bounded
+  positivity_eps: 1.0e-8
+  z_scale_um: 100.0
+  coarse_application: legacy_anchor_positive
+
+ablation:
+  use_network_refinement: true
+  use_variance_branch: true
+  use_mean_branch: true
+  use_set_branch: true
+  use_gate: true
+
+loss:
+  lambda_mean: 0.0
+  lambda_var: 1.0
+  lambda_tv: 1.0e-5
+  lambda_tv_z: 0.5
+  var_log_eps: 1.0e-6
+  mean_loss_type: smooth_l1
+
+optimization:
+  max_steps: 200
+  global_batch_size: 8
+  micro_batch_per_gpu: 1
+  lr_network: 1.0e-3
+  lr_beta: 1.0e-4
+  optimizer: Adam
+  validate_every: 20
+  checkpoint_every: 20
+
+runtime:
+  amp: false
+  psf_cache_dir: data/.cache/psf
+  operator_mode: optimized
+  operator_phase_chunk_size: 32
+  physics_use_checkpoint: true
+  tensorboard: true
+  max_peak_memory_gib: 42

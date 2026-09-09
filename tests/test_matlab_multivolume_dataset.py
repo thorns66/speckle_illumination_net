@@ -39,6 +39,10 @@ class MatlabMultiVolumeDatasetTest(unittest.TestCase):
     def test_input_shapes_and_exact_ten_frame_centering(self):
         item = MatlabMultiVolumeDataset(ROOT, "test")[0]
         self.assertEqual(tuple(item["f_var"].shape), (1, 10, 260, 260))
+        self.assertEqual(tuple(item["f_var_feature"].shape), (1, 10, 260, 260))
+        np.testing.assert_array_equal(
+            item["f_var_feature"].numpy(), item["f_var"].numpy()
+        )
         self.assertEqual(tuple(item["g_mean"].shape), (1, 10, 260, 260))
         self.assertEqual(tuple(item["residual_frames"].shape), (10, 1, 260, 260))
         self.assertEqual(tuple(item["measured_variance"].shape), (1, 260, 260))
@@ -65,6 +69,7 @@ class MatlabMultiVolumeDatasetTest(unittest.TestCase):
                 "input_indices",
                 "z_values_um",
                 "f_var",
+                "f_var_feature",
                 "g_mean",
                 "input_mean",
                 "residual_frames",
@@ -72,6 +77,19 @@ class MatlabMultiVolumeDatasetTest(unittest.TestCase):
         )
         self.assertNotIn("measured_variance", item)
         self.assertNotIn("ground_truth", item)
+
+    def test_raw_feature_keeps_sqrt_anchor_and_uses_raw_taylor_volume(self):
+        sqrt_item = load_inference_input(ROOT / "P07", 1)
+        raw_item = load_inference_input(
+            ROOT / "P07", 1, var_feature_representation="raw"
+        )
+        np.testing.assert_array_equal(raw_item["f_var"], sqrt_item["f_var"])
+        np.testing.assert_allclose(
+            raw_item["f_var_feature"],
+            np.square(sqrt_item["f_var"], dtype=np.float32),
+            rtol=2e-6,
+            atol=1e-7 * float(np.max(raw_item["f_var_feature"])),
+        )
 
 
 if __name__ == "__main__":

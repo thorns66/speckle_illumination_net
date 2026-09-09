@@ -10,6 +10,7 @@ data:
   input_frames: 10
   target_frames: 90
   subset_policy: frozen_subsets
+  var_feature_representation: sqrt
   cache_dir: data/.cache/matlab_multivolume_n10
   precompute_cache: true
 

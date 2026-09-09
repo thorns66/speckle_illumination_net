@@ -1,5 +1,49 @@
 # 多样本共享网络：训练与推理手册
 
+## 当前基线选择（2026-09-07）
+
+用户在查看归一化对比图及单层效果后决定：继续保留 **sqrt VAR 特征 + Mean + Set
+branch + Gate** 作为基线，不将无 Set 消融升级为主方案。
+
+- 基线配置：`configs/multivolume_n10_no_mean.yaml`，`var_feature_representation=sqrt`、
+  `use_set_branch=true`。`no_mean` 仅指 Mean 损失关闭，不表示移除 Mean 分支。
+- 基线运行：`outputs/multivolume_n10_no_mean_run01`；训练 200 步，物理最佳 step160，
+  权重为该目录中的 `checkpoint_best.pt`。默认训练入口仍使用这一配置。
+- 无 Set 运行 `outputs/multivolume_n10_no_set_20260907_run01` 及其配置、权重、图和
+  指标作为消融资料保留，不覆盖或替代基线。
+- 无 Set 的 W1 和对齐 NRMSE 改善仍是有效的定量观察；但用户视觉验收认为分辨率
+  没有提升、单层结果更脏，未达到替换基线的要求。该视觉反馈尚未单独量化为分辨率
+  或伪影指标，不能改写为已通过定量检验的结论。
+- W1 汇总横向像素后比较轴向质量分布；整体 NRMSE 也不直接等于分辨率或单层纯净度。
+  后续选型不能仅凭这两项主指标胜出就自动替换基线。除非用户另行指定，新实验仍以
+  上述有 Set 的 sqrt 方案为对照。
+
+## 输出命名约定（2026-09-07 起）
+
+所有新实验根目录使用 `outputs/<实验名>_<YYYYMMDD>_runNN`；日期为实际启动
+当天的北京时间，同日重复运行递增编号，禁止覆盖。根目录中的权重、指标和报告
+保留固定文件名；独立存放的汇总文件也加日期。历史结果不改名，本文后面的旧路径
+仅代表历史运行。新启动命令必须采用此命名约定。
+
+无 Set 消融使用 `configs/multivolume_n10_no_set.yaml`，只关闭 Set 及其专属门控
+修正通路，VAR/Mean、sqrt 锚点、损失、初始化种子、全局 batch 和训练步数不变。
+模块仍按原顺序构造以保持公共初始化，旁路参数在 Adam/DDP 创建前冻结。
+`utils.experiment_paths.next_experiment_path` 生成北京时间日期及未使用编号。
+使用 `python -m tools.run_no_set_ablation` 可自动核对基线、等待空闲 GPU、生成日期
+目录并运行；完成后用 `python -m tools.report_no_set_ablation --run <新实验目录>`
+生成比较。只使用没有其他计算进程的空闲卡，不添加 `--allow-busy-gpus`。
+
+主比较按各自验证物理损失最优 checkpoint，补充固定第 200 步验证及完整轨迹。
+先对子集平均，再对对象等权平均。单种子结果只表示本实验下整个 Set 通路的贡献，
+不能证明统计显著，也不能区分额外输入信息与额外模型容量的作用。
+
+可视化默认提供全体积最大值归一化的清晰版（各方法独立归一化至 0–1，统一显示
+gamma=0.5）及线性版（gamma=1），原始强度图保留用于审计。不逐层或逐投影归一化，
+不阈值裁背景；gamma 只作用于颜色，不改变深度曲线、训练输入、原始重建和评价指标。
+归一化图用于比较结构，不能比较方法间的绝对亮度。对已有结果只重绘而不重新训练：
+`python -m tools.plot_no_set_normalized --run <实验目录>`，输出自动带日期和编号，
+覆盖全部 30 个固定测试子集，并核对绘图前后源数据、权重及指标文件哈希一致。
+
 ## 1. 已冻结的实验定义
 
 正式配置为 `configs/multivolume_n10_no_mean.yaml`，其定义不是单样本 DIP：

@@ -95,6 +95,8 @@ def _validate_config(config: dict[str, Any]) -> None:
         data["target_frames"]
     ) != 90:
         raise ValueError("The frozen training protocol requires physics 10/90 data")
+    if data.get("var_feature_representation", "sqrt") not in {"sqrt", "raw"}:
+        raise ValueError("data.var_feature_representation must be 'sqrt' or 'raw'")
     if model.get("set_encoder_type", "mean_std") != "mean_std":
         raise ValueError("The first shared-training experiment requires mean/std SetBranch")
     if model.get("coarse_application", "legacy_anchor_positive") != "legacy_anchor_positive":
@@ -103,11 +105,12 @@ def _validate_config(config: dict[str, Any]) -> None:
         "use_network_refinement",
         "use_variance_branch",
         "use_mean_branch",
-        "use_set_branch",
         "use_gate",
     )
     if not all(bool(ablation.get(name, False)) for name in required_branches):
-        raise ValueError("The shared-training baseline requires VAR+Mean+Set+Gate")
+        raise ValueError("Shared training requires VAR+Mean refinement and the gate configuration")
+    if not isinstance(ablation.get("use_set_branch"), bool):
+        raise ValueError("ablation.use_set_branch must explicitly be true or false")
     if float(loss["lambda_mean"]) != 0.0 or float(loss["lambda_var"]) != 1.0:
         raise ValueError("The shared-training baseline is the no_mean absolute variance objective")
     if int(optimization["micro_batch_per_gpu"]) != 1:
@@ -261,6 +264,7 @@ def _to_device(item: dict[str, Any], device: torch.device) -> dict[str, Any]:
     output = dict(item)
     for name in (
         "f_var",
+        "f_var_feature",
         "g_mean",
         "input_mean",
         "residual_frames",
@@ -285,9 +289,30 @@ def _analytic_beta0(operator: LFMOperator, f_var: Tensor, input_mean: Tensor) ->
     return value
 
 
+def _configure_trainable_parameters(model: torch.nn.Module) -> dict[str, Any]:
+    """Freeze bypassed Set parameters without changing module initialization order."""
+    if not model.use_set_branch:
+        for name, parameter in model.named_parameters():
+            if name.startswith(("set_encoder.", "fusion.set_projection.", "fusion.gate.")) or name == "fusion.raw_alpha":
+                parameter.requires_grad_(False)
+    return {
+        "use_set_branch": model.use_set_branch,
+        "total_parameters": sum(parameter.numel() for parameter in model.parameters()),
+        "trainable_parameters": sum(
+            parameter.numel() for parameter in model.parameters() if parameter.requires_grad
+        ),
+        "frozen_parameter_names": [
+            name for name, parameter in model.named_parameters() if not parameter.requires_grad
+        ],
+    }
+
+
 def _optimizer(model: torch.nn.Module, config: dict[str, Any]) -> torch.optim.Optimizer:
     options = config["optimization"]
-    network = [parameter for name, parameter in model.named_parameters() if name != "raw_beta"]
+    network = [
+        parameter for name, parameter in model.named_parameters()
+        if name != "raw_beta" and parameter.requires_grad
+    ]
     groups = [
         {"params": network, "lr": float(options["lr_network"])},
         {"params": [dict(model.named_parameters())["raw_beta"]], "lr": float(options["lr_beta"])},
@@ -328,6 +353,7 @@ def _forward(
         item["g_mean"],
         item["residual_frames"],
         item["z_values_um"],
+        var_feature_volume=item["f_var_feature"],
         beta0=beta0,
     )
     return output, beta0
@@ -629,14 +655,22 @@ def run_training(arguments: Any) -> None:
 
         data_root = _resolve(config_path, config["data"]["root"])
         cache_dir = _resolve(config_path, config["data"]["cache_dir"])
+        dataset_options = {
+            "cache_dir": cache_dir,
+            "var_feature_representation": config["data"].get(
+                "var_feature_representation", "sqrt"
+            ),
+        }
         if rank == 0 and bool(config["data"].get("precompute_cache", True)):
             LOGGER.info("Preparing validated MAT cache")
             for split in ("train", "validation", "test"):
-                MatlabMultiVolumeDataset(data_root, split, cache_dir=cache_dir).precompute()
+                MatlabMultiVolumeDataset(data_root, split, **dataset_options).precompute()
         _barrier(world_size)
-        train_data = MatlabMultiVolumeDataset(data_root, "train", cache_dir=cache_dir)
-        validation_data = MatlabMultiVolumeDataset(data_root, "validation", cache_dir=cache_dir)
-        test_data = MatlabMultiVolumeDataset(data_root, "test", cache_dir=cache_dir)
+        train_data = MatlabMultiVolumeDataset(data_root, "train", **dataset_options)
+        validation_data = MatlabMultiVolumeDataset(
+            data_root, "validation", **dataset_options
+        )
+        test_data = MatlabMultiVolumeDataset(data_root, "test", **dataset_options)
         fingerprints = {train_data.dataset_fingerprint, validation_data.dataset_fingerprint, test_data.dataset_fingerprint}
         if len(fingerprints) != 1:
             raise RuntimeError("Dataset splits produced different fingerprints")
@@ -648,6 +682,7 @@ def run_training(arguments: Any) -> None:
         )
         variance_model = TaylorH2VarianceModel(operator, **config["noise"])
         base_model = _model_from_config(config).to(device)
+        parameter_contract = _configure_trainable_parameters(base_model)
         optimizer = _optimizer(base_model, config)
         scheduler = FixedGlobalBatchScheduler(
             len(train_data),
@@ -677,6 +712,10 @@ def run_training(arguments: Any) -> None:
             rank,
             world_size,
         )
+        if not base_model.use_set_branch and operator.phase_chunk_size != int(
+            config["runtime"]["operator_phase_chunk_size"]
+        ):
+            raise RuntimeError("No-Set comparison requires the configured physics phase chunk unchanged")
         if checkpoint is not None:
             _restore_rng(checkpoint["rng_states"][rank], device)
         if rank == 0:
@@ -706,6 +745,8 @@ def run_training(arguments: Any) -> None:
                     "world_size": world_size,
                     "phase_chunk_size": operator.phase_chunk_size,
                     "selected_psf_cache": str(psf_cache_path),
+                    "parameter_contract": parameter_contract,
+                    "preflight_peak_memory_gib": preflight_peak,
                 },
             )
 

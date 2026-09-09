@@ -316,6 +316,7 @@ class VarianceAnchoredLFMNet(nn.Module):
         residual_frames: Tensor,
         z_values_um: Tensor,
         *,
+        var_feature_volume: Tensor | None = None,
         detail_strength: float = 1.0,
         beta0: Tensor | None = None,
     ) -> ModelOutput:
@@ -323,10 +324,16 @@ class VarianceAnchoredLFMNet(nn.Module):
             raise ValueError("f_var and g_mean must share shape [B,1,Z,H,W]")
         if residual_frames.shape[0] != f_var.shape[0]:
             raise ValueError("Residual-frame batch does not match volume batch")
+        if var_feature_volume is None:
+            var_feature_volume = f_var
+        if var_feature_volume.shape != f_var.shape:
+            raise ValueError("var_feature_volume must have the same shape as f_var")
         if not 0.0 <= float(detail_strength) <= 1.0:
             raise ValueError("detail_strength must lie in [0,1]")
         original_shape = f_var.shape[-2:]
-        padded_var, _ = self._pad_lateral(self._add_network_context(f_var))
+        padded_var, _ = self._pad_lateral(
+            self._add_network_context(var_feature_volume)
+        )
         padded_mean, _ = self._pad_lateral(self._add_network_context(g_mean))
         residual_frames = self._add_network_context(residual_frames)
         pad_h = padded_var.shape[-2] - residual_frames.shape[-2]
