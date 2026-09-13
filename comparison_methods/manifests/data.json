@@ -1,0 +1,3127 @@
+{
+  "version": 1,
+  "data_root": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01/dataset_v3_frozen_view",
+  "split_sha256": "67c6f964db49bf5eeb1d4ed66ef2bfe80cbcfcf8b7a9bc4379fa4515661468f8",
+  "splits": {
+    "train": [
+      "P01",
+      "P02",
+      "P03",
+      "P04",
+      "P05",
+      "P06",
+      "P07",
+      "P08",
+      "P09",
+      "P10",
+      "P11"
+    ],
+    "validation": [
+      "V01",
+      "V02",
+      "V03"
+    ],
+    "test": [
+      "T02",
+      "T03",
+      "T04"
+    ]
+  },
+  "records": [
+    {
+      "object": "P01",
+      "subset": 1,
+      "split": "train",
+      "input_indices": [
+        10,
+        68,
+        26,
+        37,
+        83,
+        24,
+        54,
+        25,
+        61,
+        79
+      ],
+      "mean_sha256": "9856ea5cf85abfc70a34f81fd4728c5ee2a1b0754cae540a6cb7b33b7e2ff247"
+    },
+    {
+      "object": "P01",
+      "subset": 2,
+      "split": "train",
+      "input_indices": [
+        49,
+        71,
+        29,
+        81,
+        87,
+        43,
+        98,
+        40,
+        92,
+        56
+      ],
+      "mean_sha256": "4ce11131fe73f39531a7b3f6c66e6da6972a0c0398cd5fff4bbfc6946896668d"
+    },
+    {
+      "object": "P01",
+      "subset": 3,
+      "split": "train",
+      "input_indices": [
+        85,
+        75,
+        74,
+        77,
+        7,
+        23,
+        20,
+        22,
+        8,
+        30
+      ],
+      "mean_sha256": "9667dce390c29af3a150e109c03ad4bbdb06b05b0db5e5d5ee30e4556b8ce8ba"
+    },
+    {
+      "object": "P01",
+      "subset": 4,
+      "split": "train",
+      "input_indices": [
+        66,
+        64,
+        53,
+        36,
+        73,
+        59,
+        46,
+        11,
+        2,
+        38
+      ],
+      "mean_sha256": "82e18da37749df2bdd930440ea96871a6f5025de3e451b2dee65fe69f63477ec"
+    },
+    {
+      "object": "P01",
+      "subset": 5,
+      "split": "train",
+      "input_indices": [
+        84,
+        32,
+        88,
+        44,
+        89,
+        16,
+        1,
+        95,
+        15,
+        65
+      ],
+      "mean_sha256": "bbaf82ad067cd647900e0fa18b8d9b3a158ef270464cce749c2e30c05393ac31"
+    },
+    {
+      "object": "P01",
+      "subset": 6,
+      "split": "train",
+      "input_indices": [
+        35,
+        52,
+        82,
+        96,
+        80,
+        91,
+        51,
+        21,
+        97,
+        9
+      ],
+      "mean_sha256": "d03f9044fb193133ffd1aa4e7afc15d519bd3ec1bf5a64bede48b62793e31a02"
+    },
+    {
+      "object": "P01",
+      "subset": 7,
+      "split": "train",
+      "input_indices": [
+        94,
+        78,
+        58,
+        62,
+        55,
+        6,
+        63,
+        42,
+        69,
+        4
+      ],
+      "mean_sha256": "79e938bd86123a3baa85127ce8acd85331714c150e0358aced268100884540d5"
+    },
+    {
+      "object": "P01",
+      "subset": 8,
+      "split": "train",
+      "input_indices": [
+        90,
+        5,
+        47,
+        18,
+        28,
+        19,
+        60,
+        70,
+        100,
+        72
+      ],
+      "mean_sha256": "c0b5e7ae12a353d628853725bcfd0244b5d908b609c1e4423e050b02e297783e"
+    },
+    {
+      "object": "P01",
+      "subset": 9,
+      "split": "train",
+      "input_indices": [
+        76,
+        33,
+        86,
+        34,
+        41,
+        67,
+        45,
+        93,
+        99,
+        14
+      ],
+      "mean_sha256": "7a2669a69c6c6015055fed01b0a3a272fa13c0808b5f363c1c1f9a149b9ad651"
+    },
+    {
+      "object": "P01",
+      "subset": 10,
+      "split": "train",
+      "input_indices": [
+        50,
+        57,
+        3,
+        17,
+        39,
+        13,
+        31,
+        12,
+        27,
+        48
+      ],
+      "mean_sha256": "9cd97b8b17e32831a800572ffbbebef36c39b40008989dd340e1323ab046476d"
+    },
+    {
+      "object": "P02",
+      "subset": 1,
+      "split": "train",
+      "input_indices": [
+        15,
+        57,
+        84,
+        51,
+        29,
+        92,
+        45,
+        89,
+        71,
+        67
+      ],
+      "mean_sha256": "8fff3321265d62bf03d38965c3f93c7e5ae21c441cfbcb1694944af2fccab48f"
+    },
+    {
+      "object": "P02",
+      "subset": 2,
+      "split": "train",
+      "input_indices": [
+        3,
+        62,
+        95,
+        22,
+        76,
+        59,
+        58,
+        11,
+        53,
+        4
+      ],
+      "mean_sha256": "11ca69d77da37bcb70dc5dce719a8603d0e7225c9e882f799da8641aaf1264cb"
+    },
+    {
+      "object": "P02",
+      "subset": 3,
+      "split": "train",
+      "input_indices": [
+        28,
+        20,
+        80,
+        49,
+        72,
+        86,
+        100,
+        13,
+        7,
+        30
+      ],
+      "mean_sha256": "501921ef797c3e13ebc64733119623fabb1049cd86a60a3f210a8b2aa809b63c"
+    },
+    {
+      "object": "P02",
+      "subset": 4,
+      "split": "train",
+      "input_indices": [
+        23,
+        5,
+        65,
+        64,
+        93,
+        98,
+        42,
+        37,
+        82,
+        21
+      ],
+      "mean_sha256": "c4bb02a06e0870d5291bdd933a692e805c9cc6bbf6e033297e3c5c34cb634d7a"
+    },
+    {
+      "object": "P02",
+      "subset": 5,
+      "split": "train",
+      "input_indices": [
+        78,
+        94,
+        50,
+        85,
+        83,
+        96,
+        18,
+        63,
+        12,
+        73
+      ],
+      "mean_sha256": "2dbeec0bfd6d1d4403bc2f54579c224b9352af372d6b0510bacf6d8888f6a590"
+    },
+    {
+      "object": "P02",
+      "subset": 6,
+      "split": "train",
+      "input_indices": [
+        75,
+        32,
+        70,
+        99,
+        41,
+        52,
+        8,
+        26,
+        87,
+        79
+      ],
+      "mean_sha256": "15ba41446abf3c98ebcc957a64697940d1100c5e7877409fc37ba70fcb5dc129"
+    },
+    {
+      "object": "P02",
+      "subset": 7,
+      "split": "train",
+      "input_indices": [
+        38,
+        2,
+        44,
+        66,
+        91,
+        27,
+        88,
+        19,
+        24,
+        69
+      ],
+      "mean_sha256": "ba153e645eea9a94e5f0f12ba21ffd067658b010a46b4a1d6b69743e8fa6dd80"
+    },
+    {
+      "object": "P02",
+      "subset": 8,
+      "split": "train",
+      "input_indices": [
+        10,
+        74,
+        77,
+        61,
+        33,
+        31,
+        55,
+        36,
+        17,
+        16
+      ],
+      "mean_sha256": "231b25f89cd9576b700852652bebb9eb59523b17b5e25de571e2fe769bd9fe8f"
+    },
+    {
+      "object": "P02",
+      "subset": 9,
+      "split": "train",
+      "input_indices": [
+        6,
+        1,
+        34,
+        54,
+        48,
+        46,
+        81,
+        40,
+        35,
+        25
+      ],
+      "mean_sha256": "60337f08bcdca91441f8b7f3e3eeb29a6b3b9fb7c814b20ebe016f88b858e7cf"
+    },
+    {
+      "object": "P02",
+      "subset": 10,
+      "split": "train",
+      "input_indices": [
+        43,
+        68,
+        90,
+        97,
+        39,
+        9,
+        14,
+        56,
+        47,
+        60
+      ],
+      "mean_sha256": "20f28e39e0a39431c122edd0a26b928974eda5b96ed9cf3403a8a0a111e4ae7b"
+    },
+    {
+      "object": "P03",
+      "subset": 1,
+      "split": "train",
+      "input_indices": [
+        32,
+        59,
+        53,
+        99,
+        78,
+        62,
+        47,
+        17,
+        90,
+        40
+      ],
+      "mean_sha256": "8d253f3ee07cdf6cc1ee31d3eb926cdf265e700e7871997731c41c12a4ad62be"
+    },
+    {
+      "object": "P03",
+      "subset": 2,
+      "split": "train",
+      "input_indices": [
+        72,
+        81,
+        1,
+        56,
+        6,
+        30,
+        93,
+        54,
+        88,
+        24
+      ],
+      "mean_sha256": "ab1be2d01b5e148733b5c5cc389982792580870a9ccd02783ea3f73769279599"
+    },
+    {
+      "object": "P03",
+      "subset": 3,
+      "split": "train",
+      "input_indices": [
+        65,
+        44,
+        69,
+        52,
+        84,
+        27,
+        64,
+        3,
+        22,
+        10
+      ],
+      "mean_sha256": "0b1827bb8225223f1f658892d17c0aba79ad34212fa89412fbe52c6cf090a53c"
+    },
+    {
+      "object": "P03",
+      "subset": 4,
+      "split": "train",
+      "input_indices": [
+        51,
+        74,
+        29,
+        73,
+        79,
+        43,
+        67,
+        14,
+        94,
+        4
+      ],
+      "mean_sha256": "0571eeef06cdeb9c2e7ecfddd37dc5242abc1924ff0b8326cef331336f8a3dc3"
+    },
+    {
+      "object": "P03",
+      "subset": 5,
+      "split": "train",
+      "input_indices": [
+        13,
+        100,
+        76,
+        46,
+        9,
+        92,
+        36,
+        61,
+        82,
+        98
+      ],
+      "mean_sha256": "fa1a33471be09ad45a27cb62a8bc6c88bdd635b0076cbe8b7c08b30383b5182f"
+    },
+    {
+      "object": "P03",
+      "subset": 6,
+      "split": "train",
+      "input_indices": [
+        5,
+        7,
+        31,
+        18,
+        34,
+        26,
+        57,
+        38,
+        33,
+        11
+      ],
+      "mean_sha256": "5f3cee398166ad7af9cca2c330a00a5724b564753fc6a994ca567f7dea44fed0"
+    },
+    {
+      "object": "P03",
+      "subset": 7,
+      "split": "train",
+      "input_indices": [
+        50,
+        71,
+        89,
+        25,
+        95,
+        23,
+        28,
+        96,
+        42,
+        37
+      ],
+      "mean_sha256": "51a5d83edc9a4e9f3cc04c859cd16cf4d87bf995fe7f982efdcbf1043286fe89"
+    },
+    {
+      "object": "P03",
+      "subset": 8,
+      "split": "train",
+      "input_indices": [
+        70,
+        83,
+        63,
+        75,
+        86,
+        80,
+        45,
+        16,
+        39,
+        58
+      ],
+      "mean_sha256": "551634a8b5a111a61ea74912002dca0a698ab755e0d34ef54b0186a0c661728f"
+    },
+    {
+      "object": "P03",
+      "subset": 9,
+      "split": "train",
+      "input_indices": [
+        77,
+        55,
+        21,
+        41,
+        85,
+        12,
+        91,
+        15,
+        2,
+        49
+      ],
+      "mean_sha256": "d2ed59994068fffd66f341e85d7e88fb5a78b38b184199b48ec054f0c6d9a1a6"
+    },
+    {
+      "object": "P03",
+      "subset": 10,
+      "split": "train",
+      "input_indices": [
+        87,
+        66,
+        60,
+        68,
+        48,
+        20,
+        97,
+        8,
+        35,
+        19
+      ],
+      "mean_sha256": "89028e649027b94671beb86247a70572263b2ea5cd31ddeaca7c62a7c0a9b518"
+    },
+    {
+      "object": "P04",
+      "subset": 1,
+      "split": "train",
+      "input_indices": [
+        44,
+        12,
+        91,
+        7,
+        63,
+        8,
+        81,
+        31,
+        66,
+        79
+      ],
+      "mean_sha256": "f036537cba3197335545a5c60967c67add7aa773faf85452cf7d4b6a54c9526f"
+    },
+    {
+      "object": "P04",
+      "subset": 2,
+      "split": "train",
+      "input_indices": [
+        80,
+        84,
+        71,
+        19,
+        26,
+        9,
+        98,
+        58,
+        78,
+        97
+      ],
+      "mean_sha256": "6d01c5f21670f17f19538bbea5fdc3f7ca64e898b157c84a443254771c54a340"
+    },
+    {
+      "object": "P04",
+      "subset": 3,
+      "split": "train",
+      "input_indices": [
+        64,
+        4,
+        38,
+        17,
+        28,
+        45,
+        90,
+        89,
+        6,
+        95
+      ],
+      "mean_sha256": "15abd79e9fe4f5b80712f05d0b598f2dd74aace6af2ad8da2a0ce3bf95da7023"
+    },
+    {
+      "object": "P04",
+      "subset": 4,
+      "split": "train",
+      "input_indices": [
+        88,
+        74,
+        18,
+        77,
+        14,
+        75,
+        49,
+        25,
+        16,
+        41
+      ],
+      "mean_sha256": "05d28989a3247ac1f5e2bca55d243307bc493a706f925f4ea3041c3c26c96619"
+    },
+    {
+      "object": "P04",
+      "subset": 5,
+      "split": "train",
+      "input_indices": [
+        39,
+        99,
+        27,
+        24,
+        47,
+        76,
+        3,
+        87,
+        32,
+        72
+      ],
+      "mean_sha256": "acc452be0f7e41b4c371b1ee128ea055652f5927f386083b2f2821449afca9fc"
+    },
+    {
+      "object": "P04",
+      "subset": 6,
+      "split": "train",
+      "input_indices": [
+        48,
+        36,
+        21,
+        55,
+        85,
+        70,
+        13,
+        96,
+        67,
+        62
+      ],
+      "mean_sha256": "c2fedef3316f6880e4b70a13f9494ed8e6abd79bf5f170eecf21fbad03ef2f6c"
+    },
+    {
+      "object": "P04",
+      "subset": 7,
+      "split": "train",
+      "input_indices": [
+        37,
+        29,
+        23,
+        82,
+        42,
+        35,
+        92,
+        1,
+        94,
+        73
+      ],
+      "mean_sha256": "afadc3dfc6a992092cbcb7149d528be499efa69ed7d7d07975f887edf9169dfb"
+    },
+    {
+      "object": "P04",
+      "subset": 8,
+      "split": "train",
+      "input_indices": [
+        59,
+        20,
+        43,
+        60,
+        86,
+        53,
+        22,
+        61,
+        10,
+        34
+      ],
+      "mean_sha256": "67a752beaa288e1526a5bb3aa2bdc9993b13dc5eacc1e29ab450b6abf3a790fa"
+    },
+    {
+      "object": "P04",
+      "subset": 9,
+      "split": "train",
+      "input_indices": [
+        11,
+        69,
+        40,
+        15,
+        2,
+        93,
+        52,
+        50,
+        51,
+        100
+      ],
+      "mean_sha256": "8ce873de439a03286fcef2789e76d25aaddd5ceba3daeee8504e65e1788ab165"
+    },
+    {
+      "object": "P04",
+      "subset": 10,
+      "split": "train",
+      "input_indices": [
+        83,
+        46,
+        68,
+        5,
+        33,
+        56,
+        65,
+        30,
+        54,
+        57
+      ],
+      "mean_sha256": "f1293e594bfc3e221fff36ab929675d2c4d53acc770d27f0bbcee0363fa9d0e9"
+    },
+    {
+      "object": "P05",
+      "subset": 1,
+      "split": "train",
+      "input_indices": [
+        62,
+        89,
+        6,
+        14,
+        86,
+        18,
+        66,
+        5,
+        93,
+        59
+      ],
+      "mean_sha256": "15ee87e293e12eac497521aadb7e553ba8d54d3ef91c52a37d444f1db6af80d8"
+    },
+    {
+      "object": "P05",
+      "subset": 2,
+      "split": "train",
+      "input_indices": [
+        44,
+        41,
+        84,
+        65,
+        35,
+        22,
+        30,
+        91,
+        28,
+        48
+      ],
+      "mean_sha256": "058e584011ede0480e48d8cf72636281118e3a4f39379983259750f8e6af2781"
+    },
+    {
+      "object": "P05",
+      "subset": 3,
+      "split": "train",
+      "input_indices": [
+        57,
+        17,
+        34,
+        74,
+        83,
+        45,
+        94,
+        20,
+        2,
+        96
+      ],
+      "mean_sha256": "fd0a8576b3499916653d0ea008654efd70eb5de3765a2b4fdb2090cb2467eb06"
+    },
+    {
+      "object": "P05",
+      "subset": 4,
+      "split": "train",
+      "input_indices": [
+        47,
+        92,
+        67,
+        16,
+        4,
+        54,
+        29,
+        73,
+        81,
+        15
+      ],
+      "mean_sha256": "28d3f3265338798aa5a8a2f4aec7cb7f09a900c361dc9bb820834eee1922e533"
+    },
+    {
+      "object": "P05",
+      "subset": 5,
+      "split": "train",
+      "input_indices": [
+        36,
+        82,
+        12,
+        46,
+        80,
+        9,
+        32,
+        63,
+        61,
+        33
+      ],
+      "mean_sha256": "f8aebce59dcbc811e1651dc77c1204c8561f82fc7b1d03ab1d0ef8b3680987f5"
+    },
+    {
+      "object": "P05",
+      "subset": 6,
+      "split": "train",
+      "input_indices": [
+        24,
+        71,
+        1,
+        7,
+        70,
+        69,
+        42,
+        77,
+        38,
+        10
+      ],
+      "mean_sha256": "a9f6b5114baaa1e0b9b27174ef6fc8e30b1d19642f2c7e592572dfe9304f1f35"
+    },
+    {
+      "object": "P05",
+      "subset": 7,
+      "split": "train",
+      "input_indices": [
+        90,
+        37,
+        68,
+        21,
+        43,
+        100,
+        85,
+        49,
+        51,
+        64
+      ],
+      "mean_sha256": "94e65944b1fd6d982adbcdd676c974ec7405d932bf3e52104c2ce3223d86be89"
+    },
+    {
+      "object": "P05",
+      "subset": 8,
+      "split": "train",
+      "input_indices": [
+        27,
+        25,
+        55,
+        76,
+        23,
+        53,
+        31,
+        39,
+        79,
+        3
+      ],
+      "mean_sha256": "0828daf4dd1ce0221ae8be9af20031474c94bdfe30b6590df1d0b05615b2b8d5"
+    },
+    {
+      "object": "P05",
+      "subset": 9,
+      "split": "train",
+      "input_indices": [
+        11,
+        97,
+        88,
+        40,
+        72,
+        58,
+        19,
+        87,
+        56,
+        50
+      ],
+      "mean_sha256": "48f4d005f3345aece0990b81237513cf142a8ed827d36ae2eda72d03e8aefd00"
+    },
+    {
+      "object": "P05",
+      "subset": 10,
+      "split": "train",
+      "input_indices": [
+        26,
+        99,
+        52,
+        8,
+        95,
+        13,
+        60,
+        75,
+        98,
+        78
+      ],
+      "mean_sha256": "6cba6990f22c07e5ada2823cad9cfbd6b7798a357048915a14c18ad5cf1f5290"
+    },
+    {
+      "object": "P06",
+      "subset": 1,
+      "split": "train",
+      "input_indices": [
+        10,
+        48,
+        21,
+        93,
+        56,
+        1,
+        37,
+        43,
+        30,
+        65
+      ],
+      "mean_sha256": "e2df3553b3a77897b26a57e96447b6f53af9abf863bb3cafb4abd37345ce1443"
+    },
+    {
+      "object": "P06",
+      "subset": 2,
+      "split": "train",
+      "input_indices": [
+        98,
+        51,
+        14,
+        28,
+        47,
+        90,
+        69,
+        24,
+        75,
+        59
+      ],
+      "mean_sha256": "44b751fae4705c2d0aa5a1a68e86b846d6ff6e4f26906b2388cb56be4d903a3c"
+    },
+    {
+      "object": "P06",
+      "subset": 3,
+      "split": "train",
+      "input_indices": [
+        6,
+        33,
+        86,
+        11,
+        3,
+        27,
+        84,
+        2,
+        5,
+        32
+      ],
+      "mean_sha256": "5b197f68c959b093126fa8c516ac7afc8b4fd01c1701f563452f1e825e04709f"
+    },
+    {
+      "object": "P06",
+      "subset": 4,
+      "split": "train",
+      "input_indices": [
+        31,
+        58,
+        87,
+        77,
+        91,
+        71,
+        96,
+        26,
+        100,
+        35
+      ],
+      "mean_sha256": "8f86b420abf7975ae0e7bf86c8cf652d16ac172f3a191448486551212507645a"
+    },
+    {
+      "object": "P06",
+      "subset": 5,
+      "split": "train",
+      "input_indices": [
+        95,
+        94,
+        60,
+        8,
+        9,
+        13,
+        70,
+        44,
+        52,
+        66
+      ],
+      "mean_sha256": "c9c5dba63922529b8b59c0e56931ee84d706a2d57f25e7b7891ff50604eb894a"
+    },
+    {
+      "object": "P06",
+      "subset": 6,
+      "split": "train",
+      "input_indices": [
+        61,
+        19,
+        83,
+        46,
+        57,
+        88,
+        89,
+        82,
+        25,
+        67
+      ],
+      "mean_sha256": "318f76d234b5e25e6d1108832f2341320d6125586f06cf6ebc15f4ae4911a702"
+    },
+    {
+      "object": "P06",
+      "subset": 7,
+      "split": "train",
+      "input_indices": [
+        63,
+        85,
+        79,
+        53,
+        72,
+        64,
+        16,
+        81,
+        99,
+        23
+      ],
+      "mean_sha256": "53080baf26de6de94b3323ae2e68196848f2ca739cb5d7a51450b947e0cf822f"
+    },
+    {
+      "object": "P06",
+      "subset": 8,
+      "split": "train",
+      "input_indices": [
+        50,
+        45,
+        68,
+        7,
+        36,
+        29,
+        97,
+        39,
+        42,
+        34
+      ],
+      "mean_sha256": "2e825d8a17dd7479e885ab6114d080cd5c3c3e4b354541cf2ee97f92b5b7738f"
+    },
+    {
+      "object": "P06",
+      "subset": 9,
+      "split": "train",
+      "input_indices": [
+        78,
+        92,
+        40,
+        54,
+        38,
+        4,
+        49,
+        62,
+        17,
+        41
+      ],
+      "mean_sha256": "87d4704617e039e36e9b2432d3518fb8156d784cec8deaa434c60768a1843bc0"
+    },
+    {
+      "object": "P06",
+      "subset": 10,
+      "split": "train",
+      "input_indices": [
+        73,
+        22,
+        15,
+        80,
+        74,
+        18,
+        76,
+        20,
+        12,
+        55
+      ],
+      "mean_sha256": "71db9bb68a216c80a6ed065a4a321a3b53e82036308f96783935190abbb03272"
+    },
+    {
+      "object": "P07",
+      "subset": 1,
+      "split": "train",
+      "input_indices": [
+        56,
+        72,
+        14,
+        51,
+        61,
+        3,
+        78,
+        46,
+        84,
+        23
+      ],
+      "mean_sha256": "36451eee4d199f1b32cc667c202e9da42a0efaa1a682bc0bfba83d881dd5fc95"
+    },
+    {
+      "object": "P07",
+      "subset": 2,
+      "split": "train",
+      "input_indices": [
+        32,
+        10,
+        66,
+        18,
+        33,
+        27,
+        20,
+        35,
+        82,
+        40
+      ],
+      "mean_sha256": "213b1a2e09db779bbb1720655d5c3b83c4152137fd8e470579d3d891f09362d6"
+    },
+    {
+      "object": "P07",
+      "subset": 3,
+      "split": "train",
+      "input_indices": [
+        68,
+        37,
+        19,
+        99,
+        71,
+        34,
+        86,
+        50,
+        15,
+        91
+      ],
+      "mean_sha256": "ec45b2dfbf8bc86d2e5f81591f292b8b744f04472b085a87fb075ce66c7bdc5e"
+    },
+    {
+      "object": "P07",
+      "subset": 4,
+      "split": "train",
+      "input_indices": [
+        8,
+        12,
+        38,
+        60,
+        63,
+        1,
+        93,
+        22,
+        44,
+        9
+      ],
+      "mean_sha256": "2005c8833e226dd32c1e3a19fe641c84c2ad284834a301b864902057086554a4"
+    },
+    {
+      "object": "P07",
+      "subset": 5,
+      "split": "train",
+      "input_indices": [
+        77,
+        89,
+        58,
+        80,
+        97,
+        21,
+        41,
+        43,
+        87,
+        57
+      ],
+      "mean_sha256": "3e2b77129a171ffb19aa428c588ecbe08674a6ffb25fd439a1b32e14a7df424e"
+    },
+    {
+      "object": "P07",
+      "subset": 6,
+      "split": "train",
+      "input_indices": [
+        73,
+        25,
+        42,
+        4,
+        49,
+        83,
+        55,
+        45,
+        76,
+        59
+      ],
+      "mean_sha256": "f6df8891384a5dce24ec2e179d6a2b3a8cc77acd4eea1c7670b7dabbe9a1ba0c"
+    },
+    {
+      "object": "P07",
+      "subset": 7,
+      "split": "train",
+      "input_indices": [
+        36,
+        54,
+        62,
+        17,
+        94,
+        5,
+        74,
+        90,
+        26,
+        75
+      ],
+      "mean_sha256": "d11fba72aa8b4c413fe0728cb8284b4adbaa19090691a8d6db4bf7953fb3cbaa"
+    },
+    {
+      "object": "P07",
+      "subset": 8,
+      "split": "train",
+      "input_indices": [
+        92,
+        81,
+        88,
+        31,
+        6,
+        96,
+        7,
+        2,
+        16,
+        70
+      ],
+      "mean_sha256": "5ed6cec6af4ab7f2be40b35f68deb37cc1707f61c497dc48a008c240cd6c52f7"
+    },
+    {
+      "object": "P07",
+      "subset": 9,
+      "split": "train",
+      "input_indices": [
+        39,
+        52,
+        65,
+        13,
+        48,
+        11,
+        30,
+        100,
+        85,
+        64
+      ],
+      "mean_sha256": "e4b3f41de2dd72faea2513aeef8b628b5df5b4b0d1400ede89580c92698d1490"
+    },
+    {
+      "object": "P07",
+      "subset": 10,
+      "split": "train",
+      "input_indices": [
+        47,
+        24,
+        29,
+        95,
+        98,
+        79,
+        67,
+        28,
+        69,
+        53
+      ],
+      "mean_sha256": "829940ebe603abbb50f75bb22013a7c2c2bf03f73620f10afa698f20c282d440"
+    },
+    {
+      "object": "P08",
+      "subset": 1,
+      "split": "train",
+      "input_indices": [
+        10,
+        12,
+        57,
+        11,
+        47,
+        63,
+        52,
+        49,
+        24,
+        67
+      ],
+      "mean_sha256": "9d97d8539c48b0e75dff09a9397f1e707a6b59d4580971a5240fa1353b62dc3c"
+    },
+    {
+      "object": "P08",
+      "subset": 2,
+      "split": "train",
+      "input_indices": [
+        48,
+        77,
+        2,
+        65,
+        71,
+        86,
+        75,
+        98,
+        4,
+        13
+      ],
+      "mean_sha256": "6887f1300981049df8a41dea3fbdc284adbe5868a5e88ec6fd962dd5b924cece"
+    },
+    {
+      "object": "P08",
+      "subset": 3,
+      "split": "train",
+      "input_indices": [
+        36,
+        74,
+        64,
+        5,
+        20,
+        85,
+        55,
+        66,
+        14,
+        1
+      ],
+      "mean_sha256": "1861245381a2e3b50785a01597470c33d762b5e7643d4fd593cd2433c7010062"
+    },
+    {
+      "object": "P08",
+      "subset": 4,
+      "split": "train",
+      "input_indices": [
+        87,
+        51,
+        46,
+        83,
+        44,
+        15,
+        8,
+        19,
+        40,
+        91
+      ],
+      "mean_sha256": "96c80e2c63050b49ec23b9087a9e711560a42df62d83d37abed22662a257f221"
+    },
+    {
+      "object": "P08",
+      "subset": 5,
+      "split": "train",
+      "input_indices": [
+        16,
+        7,
+        22,
+        32,
+        25,
+        92,
+        3,
+        28,
+        18,
+        42
+      ],
+      "mean_sha256": "d04e0c0c5aef218dfd3ea95e0f8659b7a9c354e5786fdcbd10358fab49675277"
+    },
+    {
+      "object": "P08",
+      "subset": 6,
+      "split": "train",
+      "input_indices": [
+        58,
+        53,
+        100,
+        99,
+        54,
+        38,
+        35,
+        30,
+        97,
+        29
+      ],
+      "mean_sha256": "a09221f0dfc6a99a8e6bf3ea1215b6cc19dc93a9c25bf63ff758ef9992368445"
+    },
+    {
+      "object": "P08",
+      "subset": 7,
+      "split": "train",
+      "input_indices": [
+        50,
+        93,
+        43,
+        31,
+        23,
+        82,
+        37,
+        45,
+        70,
+        89
+      ],
+      "mean_sha256": "5be62eeee54e8668ac2c2fb4c9ee2e831fe4591802a0f3c36da82e9be4e53749"
+    },
+    {
+      "object": "P08",
+      "subset": 8,
+      "split": "train",
+      "input_indices": [
+        88,
+        33,
+        61,
+        60,
+        78,
+        73,
+        39,
+        6,
+        9,
+        72
+      ],
+      "mean_sha256": "0529f665d70be75659626d84ee113599ea758f22de1e45511cee2c1f0187d8a2"
+    },
+    {
+      "object": "P08",
+      "subset": 9,
+      "split": "train",
+      "input_indices": [
+        96,
+        84,
+        90,
+        41,
+        59,
+        68,
+        80,
+        34,
+        76,
+        69
+      ],
+      "mean_sha256": "14453fefd2b579e852eb95e183479a1c378999a0d294415a14f601fbfeee54c5"
+    },
+    {
+      "object": "P08",
+      "subset": 10,
+      "split": "train",
+      "input_indices": [
+        81,
+        62,
+        56,
+        17,
+        94,
+        95,
+        27,
+        26,
+        21,
+        79
+      ],
+      "mean_sha256": "21d3f38baa14f998b3118437005bf14da53f2374c8ebd299dad7fc30003c56e3"
+    },
+    {
+      "object": "P09",
+      "subset": 1,
+      "split": "train",
+      "input_indices": [
+        96,
+        50,
+        53,
+        62,
+        55,
+        35,
+        60,
+        2,
+        89,
+        6
+      ],
+      "mean_sha256": "21616b2266944e397e48972931c2f2b4f0c3fa8cb60f35374a959bd282278ca6"
+    },
+    {
+      "object": "P09",
+      "subset": 2,
+      "split": "train",
+      "input_indices": [
+        100,
+        22,
+        61,
+        42,
+        66,
+        5,
+        98,
+        11,
+        23,
+        88
+      ],
+      "mean_sha256": "ac6a09343380bb3977b95bf7eb7daef349be5eb9c18fc9581b87c260a3d03359"
+    },
+    {
+      "object": "P09",
+      "subset": 3,
+      "split": "train",
+      "input_indices": [
+        74,
+        70,
+        14,
+        73,
+        63,
+        18,
+        69,
+        26,
+        16,
+        71
+      ],
+      "mean_sha256": "31425c591578041dbc10d1e8210e8bf85578bbaece99e3197feae95954fed1e6"
+    },
+    {
+      "object": "P09",
+      "subset": 4,
+      "split": "train",
+      "input_indices": [
+        30,
+        36,
+        24,
+        3,
+        95,
+        94,
+        79,
+        20,
+        97,
+        28
+      ],
+      "mean_sha256": "46a671f105773d1b2698b88636c0e9a2106c2ed4a557781cf5a878ae4e08bfc5"
+    },
+    {
+      "object": "P09",
+      "subset": 5,
+      "split": "train",
+      "input_indices": [
+        81,
+        41,
+        21,
+        93,
+        86,
+        47,
+        39,
+        38,
+        68,
+        67
+      ],
+      "mean_sha256": "9189f355a4b24adc4a17c63dd19c67269a957338ac41f3883ac9d4f940158e9d"
+    },
+    {
+      "object": "P09",
+      "subset": 6,
+      "split": "train",
+      "input_indices": [
+        9,
+        8,
+        84,
+        40,
+        82,
+        27,
+        51,
+        32,
+        58,
+        46
+      ],
+      "mean_sha256": "77d4e39e6dd082aebd24a0419f6ccc060c72b574acdbd4d04f6b99c4f85013ad"
+    },
+    {
+      "object": "P09",
+      "subset": 7,
+      "split": "train",
+      "input_indices": [
+        57,
+        34,
+        90,
+        77,
+        17,
+        13,
+        75,
+        25,
+        92,
+        56
+      ],
+      "mean_sha256": "ff9a0fe041035253853cb4b955cd3ec3d6a03c4d2044ef5839aa3816ca8d5385"
+    },
+    {
+      "object": "P09",
+      "subset": 8,
+      "split": "train",
+      "input_indices": [
+        54,
+        80,
+        78,
+        44,
+        37,
+        85,
+        1,
+        31,
+        83,
+        4
+      ],
+      "mean_sha256": "d66ab21427c40f6e61db80a76ebfcdcca6b827168b604eb8a3bfe54247c4e9d3"
+    },
+    {
+      "object": "P09",
+      "subset": 9,
+      "split": "train",
+      "input_indices": [
+        29,
+        76,
+        10,
+        7,
+        33,
+        43,
+        87,
+        91,
+        15,
+        45
+      ],
+      "mean_sha256": "da1ddd42363c8d66f60225dc57e0f07db0d80956f400efa72a8df78045610496"
+    },
+    {
+      "object": "P09",
+      "subset": 10,
+      "split": "train",
+      "input_indices": [
+        65,
+        99,
+        52,
+        64,
+        49,
+        12,
+        72,
+        19,
+        59,
+        48
+      ],
+      "mean_sha256": "93c6b27ef61ee7e3fd02ff8ae12af44710e4b5d4bee581b50d7027f7f4461d08"
+    },
+    {
+      "object": "P10",
+      "subset": 1,
+      "split": "train",
+      "input_indices": [
+        1,
+        85,
+        24,
+        20,
+        64,
+        18,
+        8,
+        41,
+        21,
+        62
+      ],
+      "mean_sha256": "dbb05af4def167f7b76103fe942168f06170f5f899a2b41f5ea2a36c6d6407be"
+    },
+    {
+      "object": "P10",
+      "subset": 2,
+      "split": "train",
+      "input_indices": [
+        23,
+        22,
+        26,
+        76,
+        58,
+        19,
+        52,
+        75,
+        95,
+        93
+      ],
+      "mean_sha256": "465e7aee01ea12fd3339d4c2ecc15a14d09958346c954d5052d87bff2582a6ce"
+    },
+    {
+      "object": "P10",
+      "subset": 3,
+      "split": "train",
+      "input_indices": [
+        9,
+        96,
+        16,
+        31,
+        29,
+        12,
+        35,
+        46,
+        92,
+        89
+      ],
+      "mean_sha256": "3f800578dff46cba52410446c7ff4534028434a85e1abf20ebd467a4e050bee5"
+    },
+    {
+      "object": "P10",
+      "subset": 4,
+      "split": "train",
+      "input_indices": [
+        77,
+        15,
+        74,
+        34,
+        61,
+        66,
+        73,
+        54,
+        30,
+        6
+      ],
+      "mean_sha256": "b445e0f617138602688cf5108498f29b556a68a3896966cab42dd7692353322b"
+    },
+    {
+      "object": "P10",
+      "subset": 5,
+      "split": "train",
+      "input_indices": [
+        25,
+        82,
+        49,
+        69,
+        68,
+        11,
+        4,
+        65,
+        79,
+        45
+      ],
+      "mean_sha256": "10e0e522d3f3d0fa630ac05cfd43f8dff4b33394e0863332cc7bf511b16f4043"
+    },
+    {
+      "object": "P10",
+      "subset": 6,
+      "split": "train",
+      "input_indices": [
+        78,
+        14,
+        53,
+        32,
+        43,
+        44,
+        2,
+        60,
+        5,
+        28
+      ],
+      "mean_sha256": "25fd08267b8bb7b7900471ee1893f2dff9b4bc7986f9577863788d9bb1ac23a6"
+    },
+    {
+      "object": "P10",
+      "subset": 7,
+      "split": "train",
+      "input_indices": [
+        7,
+        50,
+        39,
+        71,
+        36,
+        40,
+        51,
+        91,
+        13,
+        47
+      ],
+      "mean_sha256": "155c300a53292e4fb5584115d5af4089266f12150ad00acf3ac3afbb7cc3be10"
+    },
+    {
+      "object": "P10",
+      "subset": 8,
+      "split": "train",
+      "input_indices": [
+        83,
+        56,
+        42,
+        99,
+        27,
+        33,
+        86,
+        98,
+        67,
+        10
+      ],
+      "mean_sha256": "1dae97aed54d6bc6f2be903fe39ca4c964ee1de3cf77cdd6f5c3c073c0f652c5"
+    },
+    {
+      "object": "P10",
+      "subset": 9,
+      "split": "train",
+      "input_indices": [
+        38,
+        37,
+        100,
+        80,
+        57,
+        84,
+        70,
+        97,
+        94,
+        87
+      ],
+      "mean_sha256": "2ed0f7cd3ea8bddacb73ca9500d936ef672a64e5baf485a51be1707a39a5e041"
+    },
+    {
+      "object": "P10",
+      "subset": 10,
+      "split": "train",
+      "input_indices": [
+        55,
+        17,
+        48,
+        3,
+        88,
+        72,
+        81,
+        90,
+        59,
+        63
+      ],
+      "mean_sha256": "7e597e890db0e86ac7d10c5bcd7b1932a20d98e3bf8a6f32cf72bfe23e390c15"
+    },
+    {
+      "object": "P11",
+      "subset": 1,
+      "split": "train",
+      "input_indices": [
+        81,
+        44,
+        6,
+        57,
+        46,
+        52,
+        29,
+        8,
+        54,
+        37
+      ],
+      "mean_sha256": "fe0ba024417c2a331e93e4dbc8466fd67eae4f73007116d74321d0132dde7680"
+    },
+    {
+      "object": "P11",
+      "subset": 2,
+      "split": "train",
+      "input_indices": [
+        91,
+        60,
+        94,
+        39,
+        15,
+        20,
+        1,
+        92,
+        56,
+        11
+      ],
+      "mean_sha256": "febcbbb00b5e79e89ae1fa6e1d15fba0e450f52d30ab8ae0cb55291b8977e4a9"
+    },
+    {
+      "object": "P11",
+      "subset": 3,
+      "split": "train",
+      "input_indices": [
+        25,
+        33,
+        90,
+        98,
+        2,
+        77,
+        66,
+        36,
+        55,
+        35
+      ],
+      "mean_sha256": "b51f2b7164666ea49d1e7e4d65a5671fd454a15881f66eb2a36fc1c9296b8645"
+    },
+    {
+      "object": "P11",
+      "subset": 4,
+      "split": "train",
+      "input_indices": [
+        49,
+        26,
+        14,
+        22,
+        34,
+        89,
+        7,
+        75,
+        84,
+        69
+      ],
+      "mean_sha256": "dbc635cfa0541638a6296bcc8c34b66d4755066dcf5fb879e032eb37faefc6e1"
+    },
+    {
+      "object": "P11",
+      "subset": 5,
+      "split": "train",
+      "input_indices": [
+        62,
+        16,
+        61,
+        42,
+        76,
+        68,
+        100,
+        28,
+        38,
+        5
+      ],
+      "mean_sha256": "88998f1563676c081452555a774d53e445f0ef784e439839eba052df4c6fa801"
+    },
+    {
+      "object": "P11",
+      "subset": 6,
+      "split": "train",
+      "input_indices": [
+        67,
+        63,
+        59,
+        80,
+        21,
+        23,
+        9,
+        10,
+        43,
+        83
+      ],
+      "mean_sha256": "8b191630bf26517a1af35966fffb7e662a01ef6091cee2d6d0e041cdbe0a2526"
+    },
+    {
+      "object": "P11",
+      "subset": 7,
+      "split": "train",
+      "input_indices": [
+        64,
+        65,
+        12,
+        47,
+        74,
+        82,
+        4,
+        87,
+        79,
+        50
+      ],
+      "mean_sha256": "836ae39d75add95b952f7687ab3d96433833407220b7021c3a8035027300e489"
+    },
+    {
+      "object": "P11",
+      "subset": 8,
+      "split": "train",
+      "input_indices": [
+        31,
+        17,
+        99,
+        18,
+        97,
+        27,
+        95,
+        3,
+        96,
+        32
+      ],
+      "mean_sha256": "f08a3545a2afc6074a84584bd052040500bcf27175d18787b6ebd1af84643f11"
+    },
+    {
+      "object": "P11",
+      "subset": 9,
+      "split": "train",
+      "input_indices": [
+        85,
+        45,
+        72,
+        73,
+        71,
+        70,
+        53,
+        93,
+        13,
+        88
+      ],
+      "mean_sha256": "5c3ff7266f8df9f02ce123831ce7cb11fe2ab22a67f70a60e2685982266251f7"
+    },
+    {
+      "object": "P11",
+      "subset": 10,
+      "split": "train",
+      "input_indices": [
+        40,
+        86,
+        24,
+        19,
+        48,
+        78,
+        58,
+        30,
+        41,
+        51
+      ],
+      "mean_sha256": "97fc26b0325180c6d8d626d7e58a70faf82b857bf87adb4c48d4f36d5b125397"
+    },
+    {
+      "object": "V01",
+      "subset": 1,
+      "split": "validation",
+      "input_indices": [
+        15,
+        86,
+        100,
+        27,
+        76,
+        3,
+        71,
+        52,
+        11,
+        73
+      ],
+      "mean_sha256": "d3833b615944bc7c913d97f4d156dbb880abc96e0f693c56aa73276c5b81f90c"
+    },
+    {
+      "object": "V01",
+      "subset": 2,
+      "split": "validation",
+      "input_indices": [
+        18,
+        99,
+        50,
+        94,
+        39,
+        85,
+        54,
+        16,
+        91,
+        55
+      ],
+      "mean_sha256": "66247ba6746cfe325725a8a16760110434b031b820dec5dbbfef01fdf1ac1420"
+    },
+    {
+      "object": "V01",
+      "subset": 3,
+      "split": "validation",
+      "input_indices": [
+        90,
+        56,
+        30,
+        82,
+        70,
+        74,
+        38,
+        92,
+        97,
+        64
+      ],
+      "mean_sha256": "0d21967e1ced6c51cd4bc2544b68b2a1c8db76de13734444e8b03e2ee7d6cd6e"
+    },
+    {
+      "object": "V01",
+      "subset": 4,
+      "split": "validation",
+      "input_indices": [
+        36,
+        79,
+        78,
+        8,
+        89,
+        5,
+        32,
+        87,
+        96,
+        45
+      ],
+      "mean_sha256": "1a0545649315df80ca739d28f43d6fb26f2bdb6de2d30e076730c176e6613018"
+    },
+    {
+      "object": "V01",
+      "subset": 5,
+      "split": "validation",
+      "input_indices": [
+        33,
+        62,
+        46,
+        60,
+        37,
+        43,
+        68,
+        9,
+        80,
+        12
+      ],
+      "mean_sha256": "60235fcd779ae3050505db82f73a7e7f205abc27f1c4b3cc1f13779a04c06aeb"
+    },
+    {
+      "object": "V01",
+      "subset": 6,
+      "split": "validation",
+      "input_indices": [
+        22,
+        63,
+        42,
+        51,
+        98,
+        28,
+        7,
+        17,
+        95,
+        29
+      ],
+      "mean_sha256": "cdd2c6b0b51bca1e3fb1c3490a8a68a939f91d860e4e3a9632ed1842f2846f29"
+    },
+    {
+      "object": "V01",
+      "subset": 7,
+      "split": "validation",
+      "input_indices": [
+        10,
+        67,
+        53,
+        41,
+        66,
+        83,
+        35,
+        24,
+        57,
+        20
+      ],
+      "mean_sha256": "4d78eea833758c433cea70f27cb5916ec8a39798be7f0b8ee21a7736f45b6d9a"
+    },
+    {
+      "object": "V01",
+      "subset": 8,
+      "split": "validation",
+      "input_indices": [
+        25,
+        59,
+        88,
+        65,
+        47,
+        58,
+        23,
+        72,
+        93,
+        4
+      ],
+      "mean_sha256": "75d248056cf5ad9c0caaeab6691149f2f7331489b93934438779fbda09eeb963"
+    },
+    {
+      "object": "V01",
+      "subset": 9,
+      "split": "validation",
+      "input_indices": [
+        31,
+        44,
+        77,
+        61,
+        84,
+        1,
+        49,
+        81,
+        13,
+        21
+      ],
+      "mean_sha256": "247500797477c8c0d784c848ca72764aee90b35613474372a7354196886a3580"
+    },
+    {
+      "object": "V01",
+      "subset": 10,
+      "split": "validation",
+      "input_indices": [
+        2,
+        40,
+        48,
+        26,
+        69,
+        6,
+        14,
+        19,
+        34,
+        75
+      ],
+      "mean_sha256": "209c727a32e9900e9291eae630093c4d527c825f2eb379b0374da4efac300df4"
+    },
+    {
+      "object": "V02",
+      "subset": 1,
+      "split": "validation",
+      "input_indices": [
+        37,
+        15,
+        22,
+        7,
+        59,
+        94,
+        93,
+        33,
+        25,
+        67
+      ],
+      "mean_sha256": "7ef3a112a75ad896ee765c698d261fc47d3d9c756e6fbd1ad12fc42c771ee67b"
+    },
+    {
+      "object": "V02",
+      "subset": 2,
+      "split": "validation",
+      "input_indices": [
+        10,
+        57,
+        49,
+        29,
+        77,
+        40,
+        76,
+        95,
+        66,
+        34
+      ],
+      "mean_sha256": "eb9cd17bdb359906b6c13a5ca58ab092d760266103b5d4700c7759fbcdb4f544"
+    },
+    {
+      "object": "V02",
+      "subset": 3,
+      "split": "validation",
+      "input_indices": [
+        8,
+        21,
+        99,
+        78,
+        90,
+        43,
+        16,
+        73,
+        72,
+        55
+      ],
+      "mean_sha256": "fe80c59fa6585ab55aa38ea7c29fb33a2ed74645b79a4b3436f87133eb9947c0"
+    },
+    {
+      "object": "V02",
+      "subset": 4,
+      "split": "validation",
+      "input_indices": [
+        81,
+        79,
+        17,
+        87,
+        65,
+        9,
+        89,
+        14,
+        2,
+        97
+      ],
+      "mean_sha256": "143e0f1059f49f724d20237ac2e47a418726fa904afb7888019affdf7f3a3726"
+    },
+    {
+      "object": "V02",
+      "subset": 5,
+      "split": "validation",
+      "input_indices": [
+        96,
+        64,
+        47,
+        26,
+        19,
+        5,
+        71,
+        80,
+        48,
+        30
+      ],
+      "mean_sha256": "00d023b35edca2360e55d8e15bb4fbef37cc170920d2baed2c4f1123561bafd5"
+    },
+    {
+      "object": "V02",
+      "subset": 6,
+      "split": "validation",
+      "input_indices": [
+        86,
+        42,
+        91,
+        24,
+        35,
+        36,
+        23,
+        54,
+        3,
+        69
+      ],
+      "mean_sha256": "85ffcdf9d379bf9e96ffa629772495142c7f7f3fb3428f94bf780aaa3fcf1270"
+    },
+    {
+      "object": "V02",
+      "subset": 7,
+      "split": "validation",
+      "input_indices": [
+        58,
+        44,
+        88,
+        74,
+        31,
+        84,
+        62,
+        68,
+        6,
+        75
+      ],
+      "mean_sha256": "81dd5035b90fc1a4deedb2856711f50d6297e9a4c8cf13faa503921eb6f7a048"
+    },
+    {
+      "object": "V02",
+      "subset": 8,
+      "split": "validation",
+      "input_indices": [
+        100,
+        45,
+        41,
+        53,
+        4,
+        46,
+        27,
+        13,
+        51,
+        32
+      ],
+      "mean_sha256": "ebbcfa89d9b768320d15cde9d969b4465bc67d7a81672b21fe8f301dbd436d3a"
+    },
+    {
+      "object": "V02",
+      "subset": 9,
+      "split": "validation",
+      "input_indices": [
+        92,
+        39,
+        18,
+        56,
+        70,
+        20,
+        82,
+        1,
+        60,
+        38
+      ],
+      "mean_sha256": "3f043df76a1e8bef32db12e151b5f48ba532d8c9574bc525fa08dd0e3328144f"
+    },
+    {
+      "object": "V02",
+      "subset": 10,
+      "split": "validation",
+      "input_indices": [
+        63,
+        52,
+        11,
+        28,
+        98,
+        12,
+        50,
+        85,
+        61,
+        83
+      ],
+      "mean_sha256": "db689443339e845747bbbffac9462cd677ac977e94484e5f5d0a3106c6aedf12"
+    },
+    {
+      "object": "V03",
+      "subset": 1,
+      "split": "validation",
+      "input_indices": [
+        74,
+        94,
+        38,
+        36,
+        81,
+        64,
+        6,
+        87,
+        69,
+        50
+      ],
+      "mean_sha256": "86ba66a7aee8ef75f76932a22ad6838b831746806b30750ae294fadefd87ad1c"
+    },
+    {
+      "object": "V03",
+      "subset": 2,
+      "split": "validation",
+      "input_indices": [
+        42,
+        75,
+        90,
+        5,
+        100,
+        78,
+        7,
+        1,
+        86,
+        10
+      ],
+      "mean_sha256": "cf20d870647dff26f325dce2c48c9c771253acb3cdbc8285d473b77a4a1441e9"
+    },
+    {
+      "object": "V03",
+      "subset": 3,
+      "split": "validation",
+      "input_indices": [
+        73,
+        24,
+        40,
+        98,
+        14,
+        47,
+        66,
+        79,
+        2,
+        61
+      ],
+      "mean_sha256": "6ebd765dbeb42154a8f0963432e40d9fda35554ddbb1fedef2a13b5af9d0131f"
+    },
+    {
+      "object": "V03",
+      "subset": 4,
+      "split": "validation",
+      "input_indices": [
+        55,
+        37,
+        70,
+        43,
+        60,
+        96,
+        18,
+        92,
+        39,
+        45
+      ],
+      "mean_sha256": "dfd28d696673d4833e48cf11a7fa9408a25c2dacfd4d9ed8d9f191dfe17d6c1d"
+    },
+    {
+      "object": "V03",
+      "subset": 5,
+      "split": "validation",
+      "input_indices": [
+        95,
+        31,
+        99,
+        33,
+        65,
+        84,
+        32,
+        63,
+        48,
+        85
+      ],
+      "mean_sha256": "f4b6bd023a0246196e8afa1cdfd2c5952525c4c29a9af1d6cbbbc89049d7dfd2"
+    },
+    {
+      "object": "V03",
+      "subset": 6,
+      "split": "validation",
+      "input_indices": [
+        9,
+        52,
+        58,
+        80,
+        30,
+        62,
+        21,
+        88,
+        91,
+        27
+      ],
+      "mean_sha256": "8fe70ebf44a851ecddd1fb0f24fab8522750bf001d551bba964c84ae2b32aaec"
+    },
+    {
+      "object": "V03",
+      "subset": 7,
+      "split": "validation",
+      "input_indices": [
+        82,
+        22,
+        57,
+        8,
+        71,
+        76,
+        89,
+        51,
+        53,
+        16
+      ],
+      "mean_sha256": "f8252ad0c0dab46971ead028d200925433abff2a866e5a92a6da2d9ed34de00b"
+    },
+    {
+      "object": "V03",
+      "subset": 8,
+      "split": "validation",
+      "input_indices": [
+        56,
+        46,
+        25,
+        35,
+        17,
+        13,
+        12,
+        26,
+        19,
+        68
+      ],
+      "mean_sha256": "8c7a13f45a9de4e3641ae7a306dc0d7bf93a05647e0936659d05ff19d52f3465"
+    },
+    {
+      "object": "V03",
+      "subset": 9,
+      "split": "validation",
+      "input_indices": [
+        72,
+        11,
+        59,
+        23,
+        41,
+        28,
+        93,
+        44,
+        83,
+        3
+      ],
+      "mean_sha256": "de834fef222ffb72c72f396da34e7102e2ea5b13b6c6270259b5c0867b013fd4"
+    },
+    {
+      "object": "V03",
+      "subset": 10,
+      "split": "validation",
+      "input_indices": [
+        54,
+        77,
+        49,
+        67,
+        20,
+        29,
+        4,
+        97,
+        34,
+        15
+      ],
+      "mean_sha256": "5c6098d66b887b787d7f269c90bfaf274bf1404fc16c3546364a92ae951bc58e"
+    },
+    {
+      "object": "T02",
+      "subset": 1,
+      "split": "test",
+      "input_indices": [
+        58,
+        59,
+        51,
+        2,
+        86,
+        22,
+        93,
+        73,
+        57,
+        81
+      ],
+      "mean_sha256": "0c3eec00f124b9efd299854955d23bdac3890da87c5078f986992386438f3858"
+    },
+    {
+      "object": "T02",
+      "subset": 2,
+      "split": "test",
+      "input_indices": [
+        61,
+        28,
+        79,
+        74,
+        70,
+        1,
+        40,
+        50,
+        83,
+        43
+      ],
+      "mean_sha256": "74491759a68f2f7541c7cf65473ce04966bc348ed68ccdcafa17dc37cb808b57"
+    },
+    {
+      "object": "T02",
+      "subset": 3,
+      "split": "test",
+      "input_indices": [
+        69,
+        54,
+        4,
+        85,
+        17,
+        39,
+        67,
+        13,
+        94,
+        91
+      ],
+      "mean_sha256": "d13d3cc9678572d45345cf1c51e9de4a1f41d5a60dd73d0ce7467417999c10df"
+    },
+    {
+      "object": "T02",
+      "subset": 4,
+      "split": "test",
+      "input_indices": [
+        90,
+        42,
+        68,
+        52,
+        27,
+        76,
+        72,
+        12,
+        19,
+        84
+      ],
+      "mean_sha256": "ac1f7dcc1b8496fd7fe39925ea2acc032366784edf9ff538434a16f324e17822"
+    },
+    {
+      "object": "T02",
+      "subset": 5,
+      "split": "test",
+      "input_indices": [
+        7,
+        6,
+        92,
+        30,
+        64,
+        21,
+        11,
+        60,
+        55,
+        75
+      ],
+      "mean_sha256": "d6e43fd688c89730413278b984535cb7c98e008d4e0a19592e2495837deefab2"
+    },
+    {
+      "object": "T02",
+      "subset": 6,
+      "split": "test",
+      "input_indices": [
+        65,
+        3,
+        24,
+        48,
+        49,
+        95,
+        31,
+        45,
+        78,
+        89
+      ],
+      "mean_sha256": "ed23edca3b65840bf303accaf9af156c36fa970fe73ee7532e9d9636ed8dc81b"
+    },
+    {
+      "object": "T02",
+      "subset": 7,
+      "split": "test",
+      "input_indices": [
+        33,
+        16,
+        41,
+        100,
+        71,
+        23,
+        46,
+        99,
+        98,
+        34
+      ],
+      "mean_sha256": "ff4cc7381cd710e6d55311b0a49094755737f31698b8aa1cb32daf9b3123e1dd"
+    },
+    {
+      "object": "T02",
+      "subset": 8,
+      "split": "test",
+      "input_indices": [
+        62,
+        35,
+        8,
+        97,
+        87,
+        25,
+        32,
+        66,
+        82,
+        15
+      ],
+      "mean_sha256": "d3fd7680ae59b0a48997149927328038c7b9cb6eef73607c540ecb9846a43891"
+    },
+    {
+      "object": "T02",
+      "subset": 9,
+      "split": "test",
+      "input_indices": [
+        5,
+        53,
+        47,
+        10,
+        37,
+        20,
+        29,
+        14,
+        88,
+        77
+      ],
+      "mean_sha256": "a76f01db9d28c4e9777616c6bd8410f6a12ef9ca5f58f3570545b63a9e09a64d"
+    },
+    {
+      "object": "T02",
+      "subset": 10,
+      "split": "test",
+      "input_indices": [
+        18,
+        80,
+        26,
+        44,
+        63,
+        36,
+        38,
+        56,
+        96,
+        9
+      ],
+      "mean_sha256": "99931f59825853063cba63a5c2f09b816d9984cb590abe866d8d83593e978e66"
+    },
+    {
+      "object": "T03",
+      "subset": 1,
+      "split": "test",
+      "input_indices": [
+        82,
+        36,
+        14,
+        38,
+        84,
+        16,
+        24,
+        25,
+        90,
+        60
+      ],
+      "mean_sha256": "56c1de2dd2df7735d91c4a1545e2f8d003c25f233bbed70bdf6a9041aeeaaf45"
+    },
+    {
+      "object": "T03",
+      "subset": 2,
+      "split": "test",
+      "input_indices": [
+        75,
+        2,
+        30,
+        70,
+        87,
+        80,
+        39,
+        7,
+        22,
+        76
+      ],
+      "mean_sha256": "e57c1945507d602b9696cda4fc2f7be48e49a3deeacdc53d0041113b79f12e5e"
+    },
+    {
+      "object": "T03",
+      "subset": 3,
+      "split": "test",
+      "input_indices": [
+        51,
+        69,
+        66,
+        89,
+        28,
+        92,
+        5,
+        95,
+        9,
+        91
+      ],
+      "mean_sha256": "a9336dbf345ce65dc70cd832937eb6d53ec6fb85599d3df47be97bc624636f90"
+    },
+    {
+      "object": "T03",
+      "subset": 4,
+      "split": "test",
+      "input_indices": [
+        47,
+        10,
+        97,
+        58,
+        27,
+        64,
+        26,
+        41,
+        93,
+        29
+      ],
+      "mean_sha256": "85d4da78198785ce5674b03693eb004d79b46ce713a09345b0029ec6b1edf5d2"
+    },
+    {
+      "object": "T03",
+      "subset": 5,
+      "split": "test",
+      "input_indices": [
+        3,
+        44,
+        15,
+        21,
+        20,
+        43,
+        53,
+        86,
+        72,
+        12
+      ],
+      "mean_sha256": "dc69926c61bfb61c497887877ba365170ac9643a920b25544b47ed7a945b5db2"
+    },
+    {
+      "object": "T03",
+      "subset": 6,
+      "split": "test",
+      "input_indices": [
+        61,
+        100,
+        48,
+        45,
+        94,
+        52,
+        79,
+        49,
+        54,
+        6
+      ],
+      "mean_sha256": "e0237d97b423d16535236e7d5d10d31f4a912fad07430b4da8ad019d42447849"
+    },
+    {
+      "object": "T03",
+      "subset": 7,
+      "split": "test",
+      "input_indices": [
+        68,
+        32,
+        46,
+        34,
+        63,
+        19,
+        18,
+        99,
+        88,
+        62
+      ],
+      "mean_sha256": "2b33525ade67c5ecfeb23bf68ac438e2d0c2bee39e9b0cc3b0b87cf8bc5af3a0"
+    },
+    {
+      "object": "T03",
+      "subset": 8,
+      "split": "test",
+      "input_indices": [
+        4,
+        85,
+        23,
+        59,
+        98,
+        65,
+        77,
+        57,
+        33,
+        11
+      ],
+      "mean_sha256": "c618db9c25c002158fcfde8898559c0885a1a9b8a43ba6878722c55649301f55"
+    },
+    {
+      "object": "T03",
+      "subset": 9,
+      "split": "test",
+      "input_indices": [
+        40,
+        81,
+        42,
+        96,
+        50,
+        74,
+        31,
+        37,
+        1,
+        35
+      ],
+      "mean_sha256": "d9adf8f47cc4ce074b122902a5f2cdb5db794aa6b815623c457cd26c9bd280c0"
+    },
+    {
+      "object": "T03",
+      "subset": 10,
+      "split": "test",
+      "input_indices": [
+        73,
+        13,
+        83,
+        78,
+        8,
+        67,
+        17,
+        55,
+        71,
+        56
+      ],
+      "mean_sha256": "39c0e996f05ce123a25ef328c4dfb482ab3754e36b6c85862634c0cb7c07ada3"
+    },
+    {
+      "object": "T04",
+      "subset": 1,
+      "split": "test",
+      "input_indices": [
+        98,
+        55,
+        80,
+        38,
+        50,
+        64,
+        67,
+        43,
+        7,
+        22
+      ],
+      "mean_sha256": "6d04f6b7ce5f5e6239bfbc382b135031928f89f263e35ef4e2019fd9ce786ad4"
+    },
+    {
+      "object": "T04",
+      "subset": 2,
+      "split": "test",
+      "input_indices": [
+        30,
+        75,
+        19,
+        15,
+        39,
+        21,
+        59,
+        76,
+        32,
+        42
+      ],
+      "mean_sha256": "2fe1c95290b51750d052d372e4dc1ae3b1511fb2b07c092e124d616e565b2236"
+    },
+    {
+      "object": "T04",
+      "subset": 3,
+      "split": "test",
+      "input_indices": [
+        17,
+        47,
+        6,
+        11,
+        90,
+        65,
+        94,
+        74,
+        23,
+        68
+      ],
+      "mean_sha256": "d130945d8dc81eeb38a9c5d47e6b8b8807f7c8f88c6d7a10a7419e62951457c7"
+    },
+    {
+      "object": "T04",
+      "subset": 4,
+      "split": "test",
+      "input_indices": [
+        95,
+        40,
+        88,
+        79,
+        77,
+        25,
+        97,
+        53,
+        81,
+        89
+      ],
+      "mean_sha256": "483d8ce4b55d8d8baef9a9a3d2fc452d86f118926bf51bc80de6054ae1fc5bbf"
+    },
+    {
+      "object": "T04",
+      "subset": 5,
+      "split": "test",
+      "input_indices": [
+        3,
+        66,
+        2,
+        36,
+        4,
+        29,
+        51,
+        56,
+        78,
+        8
+      ],
+      "mean_sha256": "d753a38cdb848344d4cec5e26cd3eae6e6fdec6cfc0437186a1cd4d241e2c33f"
+    },
+    {
+      "object": "T04",
+      "subset": 6,
+      "split": "test",
+      "input_indices": [
+        49,
+        28,
+        45,
+        26,
+        24,
+        92,
+        18,
+        99,
+        91,
+        85
+      ],
+      "mean_sha256": "d78f4ed09a7b9bfa4faa7f3bcf8d0663caa247d42c0ef95883b65b792688ccf5"
+    },
+    {
+      "object": "T04",
+      "subset": 7,
+      "split": "test",
+      "input_indices": [
+        86,
+        20,
+        37,
+        12,
+        61,
+        87,
+        13,
+        31,
+        82,
+        9
+      ],
+      "mean_sha256": "b7714f740c397082b4cc0411f205235462aa9832bbcbdb1d9865dd98beeb2703"
+    },
+    {
+      "object": "T04",
+      "subset": 8,
+      "split": "test",
+      "input_indices": [
+        73,
+        63,
+        71,
+        1,
+        60,
+        69,
+        16,
+        54,
+        48,
+        10
+      ],
+      "mean_sha256": "97002d11a030a885913ad4869d68a9a1d2b4daa1ccc32cf63041997c7ec886e9"
+    },
+    {
+      "object": "T04",
+      "subset": 9,
+      "split": "test",
+      "input_indices": [
+        46,
+        84,
+        58,
+        93,
+        96,
+        44,
+        41,
+        35,
+        70,
+        100
+      ],
+      "mean_sha256": "a871517cee8b4d73d144e3a1b06491376fb633aea2e9b8a08f20ce90c12ed72b"
+    },
+    {
+      "object": "T04",
+      "subset": 10,
+      "split": "test",
+      "input_indices": [
+        34,
+        72,
+        5,
+        62,
+        83,
+        57,
+        33,
+        27,
+        52,
+        14
+      ],
+      "mean_sha256": "93b9c68d375a8e3c30a11c2220e2374f98c01dca5f1b67dec5bfda0d4247d157"
+    }
+  ],
+  "input_scale": 7.341695308685303,
+  "vcd_target_scale": 1.05,
+  "serenet_output_scale": 0.03339418584550214,
+  "z_um": [
+    10,
+    20,
+    30,
+    40,
+    50,
+    60,
+    70,
+    80,
+    90,
+    100
+  ],
+  "pixel_pitch_um": 1.1224489795918366,
+  "normalization": "fixed train maximum; VCD GT max * 1.05, separate from SeReNet",
+  "psf_path": "/workspace/xyx/speckle_illumination_net/data/.cache/psf/selected_H_d57d0714b548a9d8c888.npy",
+  "psf_sha256": "d948b816029556888505a5d72356a0d610bc72c24fd96015370f0cbc22b425aa",
+  "sparse_manifest": {
+    "complete": true,
+    "H_path": "data/.cache/psf/selected_H_d57d0714b548a9d8c888.npy",
+    "H_shape": [
+      10,
+      49,
+      49,
+      197,
+      197
+    ],
+    "height": 260,
+    "width": 260,
+    "nnz": 282926492,
+    "threshold": 0,
+    "built_unix": 1788796464.6085777
+  }
+}

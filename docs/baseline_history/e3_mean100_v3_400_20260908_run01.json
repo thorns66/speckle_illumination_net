@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "baseline_id": "e3_mean100_v3_400_20260908_run01",
+  "display_name": "E3＋100% mean 结构梯度上限",
+  "status": "current",
+  "selection_authority": "user explicitly selected E3+100% as the new baseline",
+  "default_checkpoint_role": "final",
+  "checkpoints": {
+    "final": {
+      "path": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01/e3_mean100/checkpoint_last.pt",
+      "step": 400,
+      "sha256": "f9e11f2611aed30272a3aeb3e75c2a442d0650e544599072dd0b4b0b15eb1aa0"
+    },
+    "best": {
+      "path": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01/e3_mean100/checkpoint_best.pt",
+      "step": 360,
+      "sha256": "fb4adf43c0dbeb42f40ef2c41e23cf4535cc8975aceb893cd3d9b23e01381746"
+    }
+  },
+  "config": {
+    "path": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01/e3_mean100.yaml",
+    "sha256": "fe6440c0cbae2cd2795e88b9865bfd91c9b78cbe56adfead75d9ab74581b6cba"
+  },
+  "dataset_root": "/workspace/xyx/speckle_illumination_net/data/speckle_dataset_v3_full_20260907_run01",
+  "dataset_fingerprint": "d2984a7ed7b98f6d693b7c7209ba6603595392dae26c13b89eee4e196a7c128c",
+  "experiment_output": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01",
+  "evaluation_root": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01/evaluation/e3_mean100",
+  "report": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01/REPORT_ZH.md",
+  "source_snapshot": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01/source_snapshot",
+  "adapter_module": "tools.mean_budget_experiment",
+  "gradient_budget": 1.0,
+  "coefficient_cap": 1.0,
+  "ramp_steps": 50,
+  "seed": 20260901,
+  "training_steps": 400,
+  "global_batch_size": 8,
+  "historical_reference_output": "/workspace/xyx/speckle_illumination_net/outputs/v3_baseline_e3_mean005_400_20260908_run01",
+  "notes": [
+    "Final step 400 is the default reference; best step 360 remains a separate secondary comparison.",
+    "100% is a per-sample gradient norm cap at q, not a fixed loss weight.",
+    "Use the E3 adapter and frozen config together; generic no_mean training does not reproduce this baseline.",
+    "Future from-scratch comparisons retain the shared random initialization; fine-tuning from this checkpoint must be labeled separately."
+  ]
+}

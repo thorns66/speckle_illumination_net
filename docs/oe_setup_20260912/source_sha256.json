@@ -1,0 +1,20 @@
+{
+  "/workspace/xyx/speckle_illumination_net/utils/reconstruction_metrics.py": "83a023646f2699e0155a26853826d5a0649d01b1e97d0b4f0714aa0b1a7e9992",
+  "/workspace/xyx/speckle_illumination_net/tools/priority_validation_analysis.py": "28ee68ec8762efb23287ee81155ad700c6f275524553297b06addd58889f361e",
+  "/workspace/xyx/speckle_illumination_net/tools/v3_compare_local_audit.py": "9f5fd5721161ab6ae99cbd98fc5c7fb6b65911f3e63da07b3c599703634ce2a4",
+  "/workspace/xyx/speckle_illumination_net/tools/v3_compare_evaluation.py": "0afa0784c46e682134f48a74e8f85dfd32e0771d63cc702e58df7b43aa6534fc",
+  "/workspace/xyx/speckle_illumination_net/tools/mean_anchor_analysis.py": "3b5bdfc31d02472c7b99c40d810ab69769957da69ca71b5f2a03a7fb3a76be5f",
+  "/workspace/xyx/speckle_illumination_net/matlab_code/cell_dataset/cell_generate_illumination_3d.m": "8c29166c8a77c5e54b8ef2eb69d9b8c105d1b9732d4b98b8a0918aab95103f50",
+  "/workspace/xyx/speckle_illumination_net/matlab_code/cell_dataset/cell_forward_frame.m": "26eca1a2bb8d6b99a23e17fe654250a3ffdf22caee000c9e48f65163645467f6",
+  "/workspace/xyx/speckle_illumination_net/matlab_code/pilot_dataset/pilot_forward_frame.m": "0bfb5e6bfdc867ec8a37e0e4c0d2d7836cf94ed7e3f7b3aaa7cacb7328b06eb0",
+  "/workspace/xyx/speckle_illumination_net/datasets/matlab_multivolume_dataset.py": "8d5d4d83ef313b5338c0f07c763b631f7adb23fa479671deeed0f2c46ba71d48",
+  "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01_newbest/preflight.json": "90459c36aaa0300e697fd9faa721db9d420894bf3f5a1be3cedfac85c045a032",
+  "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01_newbest/mean_anchor_e3_mean100/run_contract.json": "cf08538e1d4c3cf67fe40b3ae6bb0f2b5209b369e51084d92afaf33182498cf4",
+  "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01_newbest/analysis/quality_per_subset.csv": "c35a2e9e4eb4ea3085e28ef898a180913a3d51fb41ce20220a9b356e68978227",
+  "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01_newbest/analysis/stability_per_object.csv": "21aa18dd363e9bd0e4d27f0b7cc3b163945dc814c65fde802b75b058a1e56f88",
+  "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01_newbest/analysis/supplemental/local_summary.csv": "9b69dfb8a127a3352cb3ce591c9148bb2e0c9cb8f7984ecb4f941acb65b71b0e",
+  "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01_newbest/spinach_root_transfer/REPORT_ZH.md": "2dd58cadab74ec8329b18faa6d8eb36a4d91279aeffa7f8b6efb2eb566da3157",
+  "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01_newbest/dataset_v3_frozen_view/T02/geometry.json": "3452df8eefa6a5d79cd92d11b5bde6e923a33051690b9cf40ff581ea055e65ad",
+  "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01_newbest/dataset_v3_frozen_view/T03/geometry.json": "6e27595eaa5fb2e2aab3f32f1d89c8883024d33e7d4a45e57a234433519d7460",
+  "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01_newbest/dataset_v3_frozen_view/T04/geometry.json": "3362bad962541949ae0d555444103fb4fb4d4768b3eaf1e1c8109eb1223325b3"
+}

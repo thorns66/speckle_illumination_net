@@ -1,0 +1,13 @@
+{
+  "pages": 5,
+  "numbered_equations": 15,
+  "editable_math_expressions": 74,
+  "references_reuse_introduction_numbering": [
+    2,
+    5,
+    7
+  ],
+  "render_checked": true,
+  "formulas_checked_against_source": true,
+  "initialization_update_verified_against_frozen_mat_record": true
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/workspace/xyx/speckle_illumination_net/docs/oe_experimental_setup_and_evaluation_20260912.docx",
+    "bytes": 12472,
+    "sha256": "2bb6be2526ffa4427f12b8c3401ccec188e6a4cc9d1ea4deaa2e2302258868b1"
+  },
+  {
+    "path": "/workspace/xyx/speckle_illumination_net/docs/oe_experimental_setup_and_evaluation_20260912.pdf",
+    "bytes": 174866,
+    "sha256": "fb38c5d68a4a8a020bc8b4dd903a6449e902eb4967f872134ec5530d2233c400"
+  },
+  {
+    "path": "/workspace/xyx/speckle_illumination_net/docs/oe_experimental_setup_and_evaluation_20260912.md",
+    "bytes": 17099,
+    "sha256": "1e4ee6fba452c0d5fc90440ebad240401af9b2b6f5374b3c1e12c9d48ea42904"
+  },
+  {
+    "path": "/workspace/xyx/speckle_illumination_net/docs/oe_experimental_setup_and_evaluation_20260912_notes.md",
+    "bytes": 7053,
+    "sha256": "7a1cb856a2ae90bb8a2a5cde28a363a49d5742b6805d213c3b835d763b404050"
+  },
+  {
+    "path": "/workspace/xyx/speckle_illumination_net/docs/oe_setup_20260912/build_setup_word.py",
+    "bytes": 16418,
+    "sha256": "540def5a8dc055edfca2cc00fd0f087580f77c1ccb788dc98167c94d22caecc9"
+  },
+  {
+    "path": "/workspace/xyx/speckle_illumination_net/docs/oe_setup_20260912/source_sha256.json",
+    "bytes": 3258,
+    "sha256": "7eec589602294ccc9c81fc6915b8bcd368a388addf065029a07288f333a8a512"
+  },
+  {
+    "path": "/workspace/xyx/speckle_illumination_net/docs/oe_setup_20260912/reference_12_verified.json",
+    "bytes": 1345,
+    "sha256": "26b94b8661448c77c32974ecfe31357dba95a9ab33e8d878cda59171413ed8af"
+  },
+  {
+    "path": "/workspace/xyx/speckle_illumination_net/docs/oe_setup_20260912/qa_report.json",
+    "bytes": 1246,
+    "sha256": "e66b051d4b6692d932397908a23742b0e086688a38a5351b3353ebf2cf03e4f0"
+  },
+  {
+    "path": "/workspace/xyx/speckle_illumination_net/docs/oe_setup_20260912/conversion_report.json",
+    "bytes": 248,
+    "sha256": "7c905009b29d5805d75193ca0a825952b5c64ec77674886cc4963aa6f5448465"
+  }
+]

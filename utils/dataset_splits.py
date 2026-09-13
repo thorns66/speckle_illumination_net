@@ -10,9 +10,16 @@ V3_SPLITS = {
     "validation": ("V01", "V02", "V03"),
     "test": ("T02", "T03", "T04"),
 }
+V4_SPLITS = {
+    "train": tuple(f"P{i:02d}" for i in range(1, 13)),
+    "validation": V3_SPLITS["validation"],
+    "test": V3_SPLITS["test"],
+}
 
 
 def expected_splits(version: int) -> dict[str, tuple[str, ...]]:
-    if type(version) is not int or version not in (2, 3):
+    if type(version) is not int or version not in (2, 3, 4):
         raise ValueError(f"Unsupported dataset split version: {version!r}")
-    return dict(LEGACY_SPLITS if version == 2 else V3_SPLITS)
+    if version == 2:
+        return dict(LEGACY_SPLITS)
+    return dict(V3_SPLITS if version == 3 else V4_SPLITS)

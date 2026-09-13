@@ -5,13 +5,14 @@ import unittest
 
 from datasets.matlab_multivolume_dataset import load_dataset_index
 from tools.run_dataset_v3 import gpu_ready, rewrite_json
-from utils.dataset_splits import LEGACY_SPLITS, V3_SPLITS, expected_splits
+from utils.dataset_splits import LEGACY_SPLITS, V3_SPLITS, V4_SPLITS, expected_splits
 
 
 class DatasetV3BuildTest(unittest.TestCase):
     def test_versioned_splits_keep_legacy_and_prevent_object_leakage(self):
         self.assertEqual(expected_splits(2), LEGACY_SPLITS)
         self.assertEqual(expected_splits(3), V3_SPLITS)
+        self.assertEqual(expected_splits(4), V4_SPLITS)
         self.assertIn("P07", expected_splits(2)["test"])
         self.assertIn("P09", expected_splits(2)["validation"])
         self.assertEqual(V3_SPLITS["train"], tuple(f"P{i:02d}" for i in range(1, 12)))
@@ -19,7 +20,10 @@ class DatasetV3BuildTest(unittest.TestCase):
         self.assertEqual(len(all_ids), len(set(all_ids)))
         self.assertNotIn("T01", all_ids)
         self.assertEqual(V3_SPLITS["test"], ("T02", "T03", "T04"))
-        for version in (1, 4, True, "3", 3.0):
+        self.assertEqual(V4_SPLITS["train"], tuple(f"P{i:02d}" for i in range(1, 13)))
+        self.assertEqual(V4_SPLITS["validation"], V3_SPLITS["validation"])
+        self.assertEqual(V4_SPLITS["test"], V3_SPLITS["test"])
+        for version in (1, 5, True, "3", 3.0):
             with self.assertRaises(ValueError):
                 expected_splits(version)
 
@@ -94,7 +98,7 @@ class DatasetV3BuildTest(unittest.TestCase):
         )
 
     def test_reader_indexes_both_versions_without_changing_baseline(self):
-        for version, count in ((2, 80), (3, 110)):
+        for version, count in ((2, 80), (3, 110), (4, 120)):
             with tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
                 self.make_index(root, version)

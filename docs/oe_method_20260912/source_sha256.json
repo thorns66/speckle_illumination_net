@@ -1,0 +1,20 @@
+{
+  "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01_newbest/mean_anchor_e3_mean100.yaml": "313b8cd2e081798169a45bdebcc2b3b76f8c5dadae5dc3e15717ab4d35df9da1",
+  "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01_newbest/mean_anchor_e3_mean100/run_contract.json": "cf08538e1d4c3cf67fe40b3ae6bb0f2b5209b369e51084d92afaf33182498cf4",
+  "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01_newbest/final_acceptance.json": "a2c7503da09d21d386072766b97bbc5a85d8942e91902b90e214d15434cc64ff",
+  "/workspace/xyx/speckle_illumination_net/models/configurable_anchor_lfm_net.py": "da0a3b2157aa3442ece0d6640336e79815c190f40c1305596a71a42ac806f6f1",
+  "/workspace/xyx/speckle_illumination_net/models/variance_anchored_lfm_net.py": "8b76f7a81afb2ba49498360494690852c276e3d7a56c318c00559897f044f788",
+  "/workspace/xyx/speckle_illumination_net/models/set_encoder.py": "6598480cb3f19093b7cc782127fbd817cc6ea14082f86f2ffd634509fe168e96",
+  "/workspace/xyx/speckle_illumination_net/models/gated_fusion.py": "9a31c9b0dcbad586f0e9cf6ca135403b2e216e4846abf8a8a938502f3e710ef8",
+  "/workspace/xyx/speckle_illumination_net/models/encoder3d.py": "fa3857a34a0c18c0abd5a5748f79d5f1f67592a0f8348c2a6f1e2f866f498482",
+  "/workspace/xyx/speckle_illumination_net/models/decoder3d.py": "1671572576ccb69e2e05bb3d4e6a4dde3b6815c9fc0bbc77538a9c42eb603308",
+  "/workspace/xyx/speckle_illumination_net/models/blocks.py": "281d271ce057f27334827f64baea6a98c777cb9d33a0f6564d4b92b3609afcec",
+  "/workspace/xyx/speckle_illumination_net/tools/mean_anchor_experiment.py": "54d61e38861395f9a27e4d70a825e6002ed82b10cca651ff7bd1652c6d9a5b44",
+  "/workspace/xyx/speckle_illumination_net/tools/v3_compare_experiment.py": "8e5e85550d646ebd2410ba45e96f238af9ece38e5be6da85d9312a26c6f6ab49",
+  "/workspace/xyx/speckle_illumination_net/losses/self_supervised_losses.py": "2cc2620e72ccfcbbabac4b3660bc67da4db4de732d6e30e44c752c42bd2bdac1",
+  "/workspace/xyx/speckle_illumination_net/physics/lfm_operator.py": "a2ead10bcb1d9d8a7d50d1fcb6169e21c7ff766a2cfdeb37d62706ee5bccde2f",
+  "/workspace/xyx/speckle_illumination_net/datasets/matlab_multivolume_dataset.py": "8d5d4d83ef313b5338c0f07c763b631f7adb23fa479671deeed0f2c46ba71d48",
+  "/workspace/xyx/speckle_illumination_net/matlab_code/Solver/deconvRL.m": "b8988c917a0cab40463221f8b952989d7e04ba5c1c26886fb3974ba70834d6a4",
+  "/workspace/xyx/speckle_illumination_net/matlab_code/pilot_dataset/pilot_reconstruct_volume.m": "2998448ed92b2a9252592cd79b8e456a6fe3ad480dca585ca55c480b15d103d6",
+  "/workspace/xyx/speckle_illumination_net/matlab_code/pilot_dataset/pilot_build_subset.m": "fedd756428e99817b9fb275abcdbedaf680603643ff5e8e691c1dcb38decdfd5"
+}

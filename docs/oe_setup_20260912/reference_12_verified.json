@@ -1,0 +1,73 @@
+{
+  "DOI": "10.1109/tip.2003.819861",
+  "title": [
+    "Image quality assessment: from error visibility to structural similarity"
+  ],
+  "author": [
+    {
+      "family": "Zhou Wang",
+      "sequence": "first",
+      "affiliation": [
+        {
+          "name": "Center for Neural Sci., New York Univ., NY, USA"
+        }
+      ],
+      "role": [
+        {
+          "vocabulary": "crossref",
+          "role": "author"
+        }
+      ]
+    },
+    {
+      "given": "A.C.",
+      "family": "Bovik",
+      "sequence": "additional",
+      "affiliation": [],
+      "role": [
+        {
+          "vocabulary": "crossref",
+          "role": "author"
+        }
+      ]
+    },
+    {
+      "given": "H.R.",
+      "family": "Sheikh",
+      "sequence": "additional",
+      "affiliation": [],
+      "role": [
+        {
+          "vocabulary": "crossref",
+          "role": "author"
+        }
+      ]
+    },
+    {
+      "given": "E.P.",
+      "family": "Simoncelli",
+      "sequence": "additional",
+      "affiliation": [],
+      "role": [
+        {
+          "vocabulary": "crossref",
+          "role": "author"
+        }
+      ]
+    }
+  ],
+  "container-title": [
+    "IEEE Transactions on Image Processing"
+  ],
+  "volume": "13",
+  "issue": "4",
+  "page": "600-612",
+  "published": {
+    "date-parts": [
+      [
+        2004,
+        4
+      ]
+    ]
+  }
+}

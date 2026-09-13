@@ -1,0 +1,15 @@
+method: serenet
+seed: 20260901
+epochs: 800
+batch_size: 1
+precision: float32
+learning_rate: 0.0001
+validate_every: 10
+selection: validation_object_macro_projection_mse
+input: mean_of_frozen_10_frames
+angles: 2401
+depths: 10
+loss: normalized_projection_mse_plus_10_squared_negative_penalty
+supervision: self_supervised_no_ground_truth_no_holdout90
+cudnn_deterministic: true
+cuda_interpolation_backward: nondeterministic_upstream_operator

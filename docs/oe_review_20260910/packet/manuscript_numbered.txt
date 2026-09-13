@@ -1,0 +1,404 @@
+0001  # Mean-anchored self-supervised reconstruction from few speckle measurements in light-field microscopy
+0002  
+0003  **[Authors to be supplied]**
+0004  
+0005  **[Affiliations and postal addresses to be supplied]**
+0006  
+0007  **[Corresponding author and email to be supplied]**
+0008  
+0009  > **作者工作稿，2026-09-10。**正文采用英文；中文框注明待补实验及必须确认的参数。现有数值只取自指定 `_newbest` 运行和其中保存的评估表。E1–E8 是待补实验编号，不表示实验已完成。图号表示拟制作的图，当前文件包含图注草稿而非已完成插图。正式投稿前由作者逐项核验论述、补齐数据并处理批注。
+0010  
+0011  ## Abstract
+0012  
+0013  Reducing speckle measurements while retaining fine spatial detail is challenging in light-field microscopy. We present a mean-anchored self-supervised reconstruction network combining mean, variance, and raw-frame features with gradient-controlled statistical constraints. Training uses disjoint measurement subsets without three-dimensional ground-truth supervision; inference requires ten frames. In simulations, the network separated equal-width bars and gaps of 4.49 µm across ten subsets, whereas mean deconvolution consistently separated 6.73 µm features. Compared with a variance-anchored network, shape error decreased from 0.8169 to 0.7828. These results support ten-frame reconstruction of fine structures and motivate direct evaluation of resolution retention against higher-frame-count reconstructions.
+0014  
+0015  > **[摘要待补：E1、E2、E6、E7]**完成减帧等效性、实测横向分辨率及两类组织实验后，用“经验证的减帧倍数＋实测细节尺度＋组织结果”替换摘要末两句，保持约 100 个英文词。当前摘要中的 4.49/6.73 µm 均为仿真条宽及间隙，不是实测 PSF 分辨率；不能改写成未经证实的光学超分辨倍数。
+0016  
+0017  ## 1. Introduction
+0018  
+0019  Light-field microscopy (LFM) encodes spatial and angular information in a camera measurement and computationally reconstructs a three-dimensional fluorescent volume. Its acquisition geometry is attractive for volumetric imaging, but recovering fine structures requires inversion of a depth-dependent optical response. Wave-optics modeling and three-dimensional deconvolution provide a physical basis for this inversion, while subsequent developments have addressed reconstruction fidelity and spatial resolution in different LFM configurations. [1](https://doi.org/10.1364/OE.21.025418), [2](https://doi.org/10.1038/s41592-023-01839-6)
+0020  
+0021  Spatially varying illumination offers an additional source of information. Under speckle illumination, different exposures modulate the same specimen with different intensity distributions. Blind structured illumination microscopy has shown that useful spatial information can be recovered without measuring each illumination pattern individually. Statistical approaches subsequently established the importance of illumination statistics and measurement covariance for recovering object information, and random illumination microscopy demonstrated their application to fluorescent biological samples. These studies motivate combining speckle illumination with computational volumetric imaging. [3](https://doi.org/10.1038/nphoton.2012.83), [4](https://doi.org/10.1109/TCI.2017.2771729), [5](https://doi.org/10.1016/j.crmeth.2021.100009)
+0022  
+0023  The acquisition burden is a central consideration for such a combination. A reconstruction based on a sequence of random illuminations must extract reproducible structure from a finite collection of measurements. Increasing the number of exposures can improve estimation of the underlying statistics, but extends the acquisition interval when exposure and illumination-switching times remain fixed. For a changing or bleaching specimen, the assumption that all frames describe the same object also becomes more demanding. The relevant imaging objective is therefore to reduce the number of acquired frames while retaining spatial detail and maintaining structural fidelity. A reduction in frame count alone is insufficient if weak features disappear, nearby structures merge, or reconstructed detail is not supported by independent observations.
+0024  
+0025  Learning-based LFM reconstruction provides a route to incorporating priors across specimens. Supervised approaches, including VCD-Net and HyLFM-Net, demonstrated rapid volumetric reconstruction and approaches to validating the reconstructed signal. Learning from corrupted observations and physics-based self-supervision offer complementary strategies when clean target volumes are difficult to obtain. In particular, SeReNet demonstrated physics-driven self-supervised reconstruction for LFM, and recent work on unrolled blind-SIM integrated learnable reconstruction with unknown illumination patterns. Thus, ground-truth-free learning and speckle-based resolution enhancement already have substantial precedents. [6](https://doi.org/10.1038/s41592-021-01058-x), [7](https://doi.org/10.1038/s41592-021-01136-0), [8](https://proceedings.mlr.press/v80/lehtinen18a.html), [9](https://doi.org/10.1038/s41592-025-02698-z), [10](https://doi.org/10.1038/s41467-026-68693-w)
+0026  
+0027  Here, we investigate how a shared reconstruction network can use a short speckle sequence to recover fine three-dimensional structure under a calibrated light-field forward model. Our design distinguishes the roles of the mean reconstruction, variance-derived information, and features extracted from the individual frames. The mean reconstruction provides the output anchor, while the other branches contribute complementary corrections. We further separate overall intensity from normalized structure: intensity is calibrated using the input measurements, and structural updates are driven by variance consistency together with a bounded contribution from mean consistency. This separation provides an explicit way to control competing statistical constraints during learning.
+0028  
+0029  The resulting method accepts ten speckle measurements for inference. During training, ten frames and their corresponding preliminary reconstructions form the input, while the remaining ninety frames of the same acquisition provide statistical constraints. No three-dimensional reference volume is used in the training objective or checkpoint-selection score. The main scientific question is whether this reconstruction strategy shifts the relationship between measurement count and recoverable spatial detail. We first establish its performance at the ten-frame operating point, including lateral feature separation, volumetric error, and stability across measurement subsets. We then specify the measurements needed to quantify resolution retention relative to higher-frame-count reconstructions and to validate the method in spinach roots and mouse brain sections.
+0030  
+0031  > **[贡献锁定：E1、E2、E6、E7]**投稿版引言末段应在实验完成后明确三项贡献：①在指定质量/分辨率标准下减少多少帧；②在指定 NA、波段和深度范围内达到什么横向细节尺度；③在菠菜根和鼠脑切片中保留哪些经独立参考确认的结构。目前不写“10 帧等效 100 帧”或“十倍提速”的完成式结论。
+0032  
+0033  ## 2. Methods
+0034  
+0035  ### 2.1. Image formation and statistical measurements
+0036  
+0037  Let \(f(\mathbf r)\geq0\) denote the three-dimensional fluorophore distribution and \(s_n(\mathbf r)\) the illumination intensity in the nth exposure. Under linear fluorescence response, a discrete measurement is represented as
+0038  
+0039  \[
+0040  y_n=\mathcal H(f\odot s_n)+\eta_n,\qquad n=1,\ldots,N_{\mathrm{acq}},
+0041  \tag{1}
+0042  \]
+0043  
+0044  where \(\mathcal H\) is the calibrated LFM operator, \(\odot\) denotes pointwise multiplication, and \(\eta_n\) accounts for measurement noise. The object is assumed to remain unchanged during acquisition of one sequence. Background correction and intensity calibration are applied consistently across frames. The statistical model below assumes that the mean illumination is spatially uniform over the modeled region or has been incorporated into the calibration.
+0045  
+0046  The implemented operator retains the periodic spatial dependence of the light-field point spread function (PSF). Object samples at different positions within a microlens period are propagated with their corresponding kernels and summed over depth. The selected PSF contains 49 × 49 within-period phase positions. These indices describe positions within a microlens period, rather than the number of microlenses. Preserving this dependence avoids replacing the light-field response with a single spatially invariant blur kernel.
+0047  
+0048  For a selected frame set \(\mathcal I\) containing N measurements, we compute the sample mean and unbiased sample variance,
+0049  
+0050  \[
+0051  \mu_{\mathcal I}=\frac{1}{N}\sum_{n\in\mathcal I}y_n,
+0052  \qquad
+0053  V_{\mathcal I}=\frac{1}{N-1}\sum_{n\in\mathcal I}(y_n-\mu_{\mathcal I})^2.
+0054  \tag{2}
+0055  \]
+0056  
+0057  The present reconstruction uses a diagonal, squared-PSF approximation to the variance response,
+0058  
+0059  \[
+0060  \widehat\mu=\mathcal H(f),\qquad
+0061  \widehat V\simeq\mathcal H_2(f^2),
+0062  \tag{3}
+0063  \]
+0064  
+0065  where \(\mathcal H_2\) is constructed by squaring each PSF kernel elementwise. It is not the composition of \(\mathcal H\) with itself. Equation (3) uses the intensity convention of the current implementation, which sets additional shot-noise and read-noise terms to zero. Spatially constant factors in the variance response are removed by the shape normalization described below. This approximation does not retain the full covariance associated with finite-width illumination speckles. The information-capacity results for full measurement covariance therefore cannot be transferred directly to Eq. (3). [4](https://doi.org/10.1109/TCI.2017.2771729)
+0066  
+0067  Two preliminary volumes are computed from exactly the same input frames. Mean-RL3, denoted \(M_{\mathcal I}\), is obtained by three Richardson–Lucy (RL) iterations using \(\mu_{\mathcal I}\) and \(\mathcal H\). Taylor-RL3-sqrt, denoted \(T_{\mathcal I}\), is the square root of the corresponding three-iteration reconstruction from \(V_{\mathcal I}\) using the squared-PSF model. The saved Taylor input is already in the square-root representation and is not square-rooted again during network inference.
+0068  
+0069  > **[作者确认：物理复现]**补入 PSF 的生成/测量方式、实际使用波长、核坐标与原点、RL 初始化和边界处理、照明均值/对比度标定。当前检测 NA=0.15、照明 NA=0.05 仅为指定配置；实机参数另行核实。**[E5]**补充有限散斑相关长度、噪声及 PSF 失配对本近似的影响。
+0070  
+0071  ### 2.2. Mean-anchored multi-branch reconstruction
+0072  
+0073  The network combines preliminary volumetric estimates with features extracted from the input speckle sequence (Fig. 1). Separate three-dimensional encoders process \(M_{\mathcal I}\) and \(T_{\mathcal I}\), using three feature scales with 16, 32, and 64 channels. Spatial downsampling is applied in the lateral dimensions, while all native axial samples are retained. Feature normalization in the volumetric encoders is separate from the physical intensity scale used in the output and forward losses.
+0074  
+0075  A third branch processes centered measurements \(d_n=y_n-\mu_{\mathcal I}\). The same two-dimensional convolutional encoder is applied to each frame, with 8, 16, and 32 channels at its three scales. The feature mean and standard deviation are aggregated over the frame dimension. The resulting two-dimensional features are lifted to three dimensions by combining them with the physical depth coordinates. This construction is invariant to permutations of the input-frame order and accepts an unordered sequence. The current model uses mean/standard-deviation aggregation rather than a Transformer.
+0076  
+0077  At scale l, the volumetric features form a joint feature tensor \(P_l\). The lifted set feature \(S_l\) is incorporated through a learned gate,
+0078  
+0079  \[
+0080  F_l=P_l+\alpha_l G_l\odot C_l(S_l),
+0081  \qquad
+0082  G_l=\sigma\!\left(D_l([P_l,S_l])\right),
+0083  \tag{4}
+0084  \]
+0085  
+0086  where \(C_l\) and \(D_l\) are learned projections, \(\sigma\) is the sigmoid function, and \(\alpha_l\) is a learned scalar initialized to approximately 0.05. Each gate assigns one value per voxel, shared across feature channels. A three-dimensional decoder combines the fused scales and predicts a residual volume \(R_\theta\).
+0087  
+0088  The output is anchored to the mean-derived estimate. Defining \(A=\beta M_{\mathcal I}\), the nonnegative intermediate reconstruction is
+0089  
+0090  \[
+0091  f_0=
+0092  \begin{cases}
+0093  A+R_\theta,& R_\theta\geq0,\\
+0094  A\exp\!\left[R_\theta/\max(A,\epsilon_p)\right],&R_\theta<0.
+0095  \end{cases}
+0096  \tag{5}
+0097  \]
+0098  
+0099  The decoder output layer is initialized to zero, so that the initial reconstruction equals A. The scale \(\beta\) is initialized by matching the forward projection of the mean anchor to the input mean and is constrained to a bounded interval around that initial value. Equation (5) permits positive corrections and nonnegative attenuation of the anchor; it does not impose a small-residual constraint. The Taylor volume remains an input feature when the reconstruction anchor is changed. The anchor comparison therefore retains the same types of input information in both networks.
+0100  
+0101  ### 2.3. Separation of intensity and structure
+0102  
+0103  We express the final volume as a nonnegative normalized structure multiplied by a global intensity scale,
+0104  
+0105  \[
+0106  q=\frac{f_0}{\max(\sum_{\mathbf r} f_0(\mathbf r),\epsilon_q)},
+0107  \qquad \hat f=a q.
+0108  \tag{6}
+0109  \]
+0110  
+0111  The initial intensity scale is estimated analytically from the input mean,
+0112  
+0113  \[
+0114  a_0=\max\!\left(0,
+0115  \frac{\langle\mathcal H(q),\mu_{\mathcal I}\rangle}
+0116  {\max(\|\mathcal H(q)\|_2^2,\epsilon_a)}\right),
+0117  \qquad
+0118  a=a_0[1+0.2\tanh(\gamma)],
+0119  \tag{7}
+0120  \]
+0121  
+0122  where \(\gamma\) is a scalar shared across training examples. When calculating \(a_0\) and the mean prediction for the ordinary intensity loss, q is detached from the gradient graph. Consequently, that mean loss updates \(\gamma\) without directly modifying the normalized structure. At inference, the global scale is determined from the ten input frames and the learned scalar, with no access to additional measurements or a reference volume. The intermediate anchor scale \(\beta\) and the final intensity scale a have different roles.
+0123  
+0124  ### 2.4. Self-supervised statistical constraints
+0125  
+0126  For each training example, the acquired sequence is divided into disjoint input and constraint sets, \(\mathcal I\cap\mathcal C=\varnothing\), with \(|\mathcal I|=10\) and \(|\mathcal C|=90\). The input volumes and raw-frame features are derived exclusively from \(\mathcal I\). The mean \(\mu_{\mathcal C}\) and variance \(V_{\mathcal C}\) provide training targets in measurement space. This scheme uses additional training measurements but no three-dimensional ground-truth reconstruction as a supervised target.
+0127  
+0128  Let \(\mathcal N(u)=u/\max(\operatorname{mean}_{xy}u,\epsilon_N)\), and let \(\rho\) denote the mean SmoothL1 loss. The normalized variance loss is
+0129  
+0130  \[
+0131  L_V=\rho\!\left(
+0132  \log[\mathcal N(\mathcal H_2(q^2))+\epsilon_v],
+0133  \log[\mathcal N(V_{\mathcal C})+\epsilon_v]
+0134  \right),\qquad \epsilon_v=10^{-6}.
+0135  \tag{8}
+0136  \]
+0137  
+0138  The ordinary mean loss controls intensity,
+0139  
+0140  \[
+0141  L_{M,a}=\rho\!\left(
+0142  \frac{a\mathcal H(\operatorname{sg}(q))}{s_\mu},
+0143  \frac{\mu_{\mathcal C}}{s_\mu}
+0144  \right),
+0145  \quad s_\mu=\max(\operatorname{mean}_{xy}|\mu_{\mathcal C}|,10^{-8}),
+0146  \tag{9}
+0147  \]
+0148  
+0149  where \(\operatorname{sg}\) denotes stop-gradient. A separate mean-shape loss contributes structural information,
+0150  
+0151  \[
+0152  L_{M,q}=\rho\!\left(
+0153  \mathcal N(\mathcal H(q)),\mathcal N(\mu_{\mathcal C})
+0154  \right).
+0155  \tag{10}
+0156  \]
+0157  
+0158  Rather than using a fixed weight for this structural term, we limit its gradient contribution at q for each training sample:
+0159  
+0160  \[
+0161  c_t=\operatorname{sg}\!\left[
+0162  \min\!\left(1,
+0163  b_t\frac{\|\nabla_q L_V\|_2}
+0164  {\|\nabla_q L_{M,q}\|_2+10^{-12}}
+0165  \right)\right],
+0166  \qquad b_t=\min(t/50,1).
+0167  \tag{11}
+0168  \]
+0169  
+0170  Here t counts optimizer updates from one. The coefficient is detached, so differentiation through the gradient-norm ratio is not included in training. After the ramp, the weighted mean-shape gradient has a norm no larger than the variance gradient, subject to numerical tolerance. This is a bound in normalized-reconstruction space, rather than a bound on each network-parameter update. It does not require the two gradients to have equal norms or aligned directions.
+0171  
+0172  The full objective is
+0173  
+0174  \[
+0175  L=L_{M,a}+L_V+c_tL_{M,q}
+0176  +10^{-5}\operatorname{TV}_{0.5}\!\left(q\operatorname{sg}(a)\right),
+0177  \tag{12}
+0178  \]
+0179  
+0180  with
+0181  
+0182  \[
+0183  \operatorname{TV}_{0.5}(u)=
+0184  \operatorname{mean}|D_xu|+\operatorname{mean}|D_yu|
+0185  +0.5\operatorname{mean}|D_zu|.
+0186  \tag{13}
+0187  \]
+0188  
+0189  The mean-shape gradient budget, referred to as “mean≤100%” in the experiment records, is therefore an adaptive optimization constraint, not a fixed loss weight of one. Self-supervised checkpoint selection uses the validation-object average of \(L_{M,a}+L_V+10^{-5}\operatorname{TV}_{0.5}\), excluding the training-only adaptive mean-shape term. The current implementation records ground-truth evaluation metrics separately; they do not enter this selection score.
+0190  
+0191  ### 2.5. Simulation data and implementation
+0192  
+0193  The current evaluation uses eleven training objects, three validation objects, and three test objects. Each object has one hundred simulated measurements and ten fixed input/constraint splits, giving 110 training, 30 validation, and 30 test object–subset instances. All measurements and derived volumes belonging to an object are assigned to the same partition. Different subsets of one acquisition can overlap and are treated as repeated measurements of the same object.
+0194  
+0195  Volumes contain 260 × 260 lateral samples and ten axial samples. The lateral pitch is approximately 1.12245 µm; depth positions extend from 10 to 100 µm in 10 µm increments. The configuration specifies detection and illumination numerical apertures of 0.15 and 0.05, respectively. These values characterize the present numerical configuration and are not substituted for unconfirmed experimental settings. The test objects comprise interrupted tubular structures (T02), a three-bar chart (T03), and axial pairs with control regions (T04).
+0196  
+0197  Both network anchors are compared after 400 optimizer updates using a common initialization seed of 20260901 and a global batch size of eight. The network is trained with Adam, using an initial network learning rate of \(10^{-3}\) and scalar learning rates of \(10^{-4}\). After 200 updates, these rates are reduced to \(10^{-4}\) and \(10^{-5}\), respectively. Validation is performed every twenty updates. The training contract records 1,188,377 trainable parameters and six participating GPUs. Computation uses FP32 with AMP and TF32 disabled. The final 400-update checkpoint is the primary model in the present comparisons.
+0198  
+0199  > **[E5：独立性与可复现性]**补充至少多个训练随机种子，并在模型与阈值锁定后增加新的独立测试对象/测试采集。当前 T02–T04 已用于开发阶段方法比较；正式稿应说明这一历史，不能将已有测试集重新描述成从未用于方案选择的最终盲测。补充仿真散斑生成方式、相关长度、噪声/光子水平、完整硬件与版本，说明生成器与训练近似的差别。
+0200  
+0201  ### 2.6. Spatial fidelity, resolution, and measurement-budget evaluation
+0202  
+0203  Volumetric shape error is measured by an intensity-scale-aligned normalized root-mean-square error,
+0204  
+0205  \[
+0206  \operatorname{NRMSE}_{\mathrm{shape}}
+0207  =\frac{\|\alpha^*\hat f-f_{\mathrm{GT}}\|_2}{\|f_{\mathrm{GT}}\|_2},
+0208  \qquad
+0209  \alpha^*=\max\!\left(0,
+0210  \frac{\langle\hat f,f_{\mathrm{GT}}\rangle}{\max(\|\hat f\|_2^2,\epsilon)}\right).
+0211  \tag{14}
+0212  \]
+0213  
+0214  The scale adjustment is used only for evaluation and does not spatially register the reconstruction. We additionally report the Wasserstein-1 distance between normalized axial intensity distributions, the structural similarity of lateral maximum-intensity projections (MIPs), and the fraction of reconstructed mass outside a lateral support mask. The latter mask is obtained by thresholding the ground-truth MIP at 10% of its maximum and applying two binary-dilation iterations. It is a lateral support measure, rather than a full three-dimensional background measure. Object-level values are averaged across subsets before equal-weight averaging across test objects.
+0215  
+0216  The T03 chart contains horizontal and vertical groups of three equal-width bars with equal-width gaps. Bar widths are 2.24490, 3.36735, 4.48980, 6.73469, 8.97959, and 11.22449 µm. For each group, evaluation selects the native plane having the largest reconstructed mass within its predefined region. The selected plane must lie within 10 µm of the target depth. A transverse profile is averaged over the central 60% of the bar length. All three detected peaks must match the target centers within two lateral pixels, exceed 10% of the full-volume maximum, and have intervening valley-to-weaker-peak ratios no greater than 0.8. The 5% and 20% peak thresholds are retained as sensitivity analyses. This criterion jointly evaluates localization, feature detection, and separation, so its aggregate success rate is not a pure optical transfer-function measurement.
+0217  
+0218  For subset stability, each reconstruction is normalized to unit mass. We calculate its relative deviation from the subset-average volume and the pairwise Wasserstein distance between subset axial profiles. For structural specificity, the tubular object is assessed using centerline localization, false breaks, and false connections across known interruptions. Axial pairs are evaluated on native depth samples without interpolation to create apparent intermediate peaks.
+0219  
+0220  To quantify measurement reduction, we define the required frame count for method m at a predeclared fidelity target \(\mathcal Q_*\) as
+0221  
+0222  \[
+0223  N_{\min}^{(m)}(\mathcal Q_*)=
+0224  \min\{N:\text{method }m\text{ satisfies }\mathcal Q_*\text{ with }N\text{ frames}\}.
+0225  \tag{15}
+0226  \]
+0227  
+0228  The target must include a spatial-separation or measured-resolution criterion together with limits on structural error and false features. The validated frame-reduction factor relative to a baseline is then \(N_{\min}^{(\mathrm{baseline})}/N_{\min}^{(\mathrm{proposed})}\). This definition prevents a nominal reduction in input count from being interpreted as a successful imaging improvement when structural fidelity is lost.
+0229  
+0230  > **[E1：核心减帧实验，必须补]**比较 N=5/10/20/50/100 的合理迭代预算 Mean-RL/Taylor-RL，以及 10 帧网络；对每个 N 重算其本身的输入，报告误差、条纹判据和伪结构。优先做“10 帧网络 vs 50/100 帧传统算法”；固定每帧曝光和固定总曝光量分别报告。参考帧不可参与 10 帧推理或测试调参。若训练 N=100 网络，约束帧需另采/另生成，不能复用这 100 帧冒充独立约束。
+0231  
+0232  > **[E2：核心横向分辨实验，必须补]**在多个深度和视野位置测荧光微球/独立线对靶，报告实际 PSF/FWHM 或预定线对分离判据。4.49 µm 条宽对应等宽间隙时的周期为 8.98 µm；它与 FWHM、Rayleigh 距离、光学截止周期并非同一指标。先锁定评价尺度和阈值，再增加细尺度靶，不能用已有离散条宽比直接宣布 1.5 倍光学超分辨。
+0233  
+0234  > **[E3：轴向标定]**补充多个深度和间距的轴向点对/薄层测量，分别报告定位误差和双峰可分辨性；若主张三维/各向同性高分辨，则此项必须通过。10 µm z 采样间隔本身不构成 10 µm 轴向分辨率证据。
+0235  
+0236  ### 2.7. Optical setup and biological specimens
+0237  
+0238  The experimental validation is designed to evaluate the same reconstruction principles on fluorescent spinach-root specimens and mouse brain sections. The acquisition uses **[illumination source and wavelength]**, **[speckle-generation device]**, a **[magnification, detection NA, and objective model]** objective, a **[microlens pitch and focal length]** microlens array, and a **[camera model and pixel pitch]** detector. Each sequence contains **[number]** raw frames acquired with **[exposure time]** exposure and **[illumination switching/readout time]**. The sample-plane power, illumination NA, emission band, effective pixel size, and reconstruction depth range are **[to be supplied from acquisition records]**.
+0239  
+0240  Spinach roots are prepared using **[sample source, preparation, fixation if applicable, fluorescence labeling or autofluorescence channel, and mounting medium]**. The biological replicate is an independently prepared root, with **[number]** roots and **[number]** fields of view per root. Mouse brain sections are obtained from **[animal or tissue source]**, from **[brain region]**, and prepared using **[fixation, section thickness, label, and mounting protocol]**. The biological replicate is the independent animal or independently sourced donor tissue, with sections and fields nested within it. **[Insert the applicable ethics approval and protocol number, or the accurate provenance of commercially obtained or archived tissue.]**
+0241  
+0242  For both specimen types, a co-registered independent three-dimensional reference is planned using **[reference modality and its calibrated resolution]**. A high-frame-count reconstruction will be treated as a computational reference rather than automatically as ground truth. Model adaptation, if used for experimental optics, will be confined to designated development specimens and reported separately from fixed-model transfer.
+0243  
+0244  > **[E6：菠菜根正式实验]**补充原始线性强度采集、系统校准、独立根重复和共聚焦等参考。重点检验细胞/组织边界、细管连续性和层间串扰，尤其核查假断裂。
+0245  
+0246  > **[E7：鼠脑切片正式实验]**补齐真实染色/标记、厚度、动物/供体层级和参考成像。以实际能确认的细胞核、胞体、粗突起或血管为目标；不预设可以分辨突触、树突棘或其它超微结构。
+0247  
+0248  ## 3. Results
+0249  
+0250  ### 3.1. Fine lateral structure recovered from ten measurements
+0251  
+0252  The three-bar chart provides a direct test of whether a ten-frame reconstruction preserves neighboring features at different lateral scales (Fig. 2). Under the predefined 10% peak threshold and valley criterion, the mean-anchored network separated the 4.48980 µm bar-and-gap groups in both orientations for all ten input subsets. The 3.36735 and 2.24490 µm groups were not separated. Mean-RL3 consistently separated the 6.73469 µm groups, while at 4.48980 µm it passed in none of the ten horizontal evaluations and one of the ten vertical evaluations. The proposed network therefore recovered smaller chart features more consistently than its mean-derived initialization at this ten-frame operating point.
+0253  
+0254  **Table 1. Existing ten-frame lateral feature-separation results.** Entries give successful horizontal/vertical evaluations, each out of ten subsets of the same chart. Bar width equals gap width. The primary peak threshold is 10% of each reconstruction's full-volume maximum.
+0255  
+0256  | Method | 2.245 µm | 3.367 µm | 4.490 µm | 6.735 µm | 8.980 µm | 11.224 µm |
+0257  |---|---:|---:|---:|---:|---:|---:|
+0258  | Mean-RL3 | 0/0 | 0/0 | 0/1 | 10/10 | 10/10 | 10/10 |
+0259  | Taylor-RL3-sqrt | 0/0 | 0/0 | 10/10 | 0/10 | 0/0 | 0/0 |
+0260  | Taylor-anchored network | 0/0 | 0/0 | 10/10 | 10/10 | 10/10 | 10/10 |
+0261  | **Mean-anchored network** | **0/0** | **0/0** | **10/10** | **10/10** | **10/10** | **10/10** |
+0262  
+0263  The Taylor-RL3-sqrt control also separated the 4.490 µm features, but its success was nonmonotonic across scale. The composite criterion additionally requires feature detection and correct depth localization; therefore, failure at larger widths cannot be interpreted as a simple resolution cutoff. Across all twelve chart groups, the mean-anchored network achieved a separation rate of 66.7%, compared with 50.8% for Mean-RL3 and 25.0% for Taylor-RL3-sqrt. The Taylor-anchored network also achieved 66.7%, indicating that the anchor change did not improve the smallest consistently separated width relative to that network. Its benefit is evaluated through volumetric fidelity and stability below.
+0264  
+0265  These observations support reconstruction of fine chart structure from ten input measurements and identify where the method improves over its preliminary reconstructions. They do not establish an absolute experimental resolution or show that ten-frame acquisition matches a higher-frame-count baseline. Both questions require the complementary evaluations in Sections 3.2 and 3.5–3.6.
+0266  
+0267  > **[E2：此处补入实测主结果]**插入多深度微球/线对结果及不确定性，分别给横向 x/y；加入匹配采样、NA 和波段的传统重建。保留现有 4.49 µm 通过、3.37 µm 未通过这一完整边界。Fig. 2 必须包含原生层、固定位置剖面和失败尺度。
+0268  
+0269  ### 3.2. Measurement reduction at matched spatial fidelity
+0270  
+0271  The ten-frame input protocol establishes the number of measurements used for inference, whereas the magnitude of acquisition reduction must be assessed at matched output quality. Figure 3 is reserved for the relationship between frame count and recoverable detail. The principal comparison is the ten-frame proposed reconstruction against conventional reconstructions obtained from progressively larger measurement sets, with their iteration counts selected on validation data. This comparison will determine whether the proposed method reaches a spatial-fidelity target with fewer measurements than the conventional approaches.
+0272  
+0273  **Table 2. Measurement-budget comparison to be completed.** No acquisition-reduction factor has yet been established by the available run.
+0274  
+0275  | Reconstruction | Frames entering inference | Native-plane detail criterion | Volume/structural error | False-feature metric | Acquisition / complete reconstruction time |
+0276  |---|---:|---|---|---|---|
+0277  | Mean-anchored network | 10 | Existing T03 result: Table 1; experimental resolution pending | Existing simulation: Table 3 | Existing simulation: Section 3.3 | Pending E8 |
+0278  | Mean-RL, validated iteration count | 10 / 20 / 50 / 100 | Pending E1 | Pending E1 | Pending E1 | Pending E8 |
+0279  | Taylor-RL-sqrt, validated iteration count | 10 / 20 / 50 / 100 | Pending E1 | Pending E1 | Pending E1 | Pending E8 |
+0280  | Compatible statistical/physics-based reconstruction | Same low and high budgets | Pending E1 | Pending E1 | Pending E1 | Pending E8 |
+0281  
+0282  > **[E1：完成后替换本节占位段落]**报告满足预定质量标准的最小帧数、相应减少倍数及跨对象不确定性。可采用结论句槽位：“At a matched [defined criterion], the proposed method required [N] frames, whereas [baseline] required [M] frames, corresponding to a validated [M/N]-fold reduction.” 只有实际结果支持时才填入；若仅部分样本或深度满足，应写明范围。固定每帧曝光与固定总曝光量的结论分别表述。
+0283  
+0284  ### 3.3. Volumetric fidelity and structural specificity
+0285  
+0286  We next evaluated whether fine lateral detail was accompanied by improved reconstruction of the three-dimensional object. Table 3 summarizes the object-macro results across the tubular, three-bar, and axial-pair test objects. The mean-anchored network reduced the shape NRMSE from 0.8169 to 0.7828 relative to the Taylor-anchored network, a relative reduction of 4.18%. The axial-distribution Wasserstein distance decreased from 5.22 to 4.64 µm, and the mass outside the lateral support mask decreased from 0.378% to 0.249%. These results indicate an improvement in the joint distribution of reconstructed structure and depth under the current training conditions.
+0287  
+0288  **Table 3. Existing simulation results at ten input frames.** Values are averages of object-level subset means for three test objects. All network results use 400-update final models. RL3 denotes the three-iteration initialization controls.
+0289  
+0290  | Method | Shape NRMSE ↓ | Axial W1 (µm) ↓ | Lateral support-exterior mass (%) ↓ | XY-MIP SSIM ↑ |
+0291  |---|---:|---:|---:|---:|
+0292  | Mean-RL3 | 0.9300 | 21.95 | 16.991 | 0.74595 |
+0293  | Taylor-RL3-sqrt | 0.9457 | 24.53 | 20.178 | 0.72437 |
+0294  | Taylor-anchored network | 0.8169 | 5.22 | 0.378 | 0.74746 |
+0295  | **Mean-anchored network** | **0.7828** | **4.64** | **0.249** | 0.74714 |
+0296  
+0297  The gains are not uniform across all metrics or structures. The lateral MIP SSIM was essentially unchanged between the network variants. In the tubular object, the mean-anchored network localized 97.1% of the centerline samples, compared with 99.9% for the Taylor-anchored network. The false-break rate increased from 3.1% to 16.9%, and the false-connection rate across predefined gaps increased from 1.7% to 10.0%. These local errors show that improved global shape and depth metrics do not guarantee preservation of every weak continuous structure. Figure 4 should therefore display representative local discrepancies in addition to global projections.
+0298  
+0299  For axial pairs, the local depth-distribution error improved from 7.32 to 6.82 µm, and the expected-layer energy fraction increased from 0.420 to 0.472. However, both network variants had zero formal separation success for the evaluated 20–40 µm pair-spacing groups. Energy placed nearer the correct depths should consequently be interpreted as improved depth distribution, without implying successful axial two-feature resolution. Adjacent 10 µm layers are assessed through their native layer energies, without interpolating the axial profile to generate additional peaks.
+0300  
+0301  > **[E3：轴向结论边界]**若补充实验仍不能分开双层，保留本段，将论文的高分辨重点限定为横向结构，并用“volumetric reconstruction with improved depth distribution”描述轴向表现。**[E1/E5]**RL3 不是经过充分优化的传统算法上限，提交前补合理迭代预算及独立对象的相同指标。
+0302  
+0303  ### 3.4. Role of the mean anchor and stability across subsets
+0304  
+0305  Changing the anchor while retaining the feature branches, training data, initialization seed, and optimization budget provides a controlled test of the output parameterization. The mean anchor reduced the relative dispersion of normalized subset reconstructions from 0.2551 to 0.2412. The pairwise Wasserstein distance between subset axial profiles decreased from 0.364 to 0.251 µm. These changes show that the predicted shape and depth distribution became more consistent across the ten selected measurement subsets of each object.
+0306  
+0307  Stability alone is not sufficient evidence of accurate reconstruction. Mean-RL3 had a smaller normalized subset dispersion of 0.1811 and a smaller pairwise axial distance of 0.038 µm, despite its substantially larger ground-truth shape and depth errors. The useful comparison is therefore the joint behavior of fidelity, resolvable features, and repeatability. The mean-anchored network improved several of these measures relative to the Taylor-anchored network, while retaining the same smallest consistently separated chart width.
+0308  
+0309  The term “anchor” refers to the reconstruction parameterization and initialization, rather than a guarantee that the final volume remains close to the preliminary mean volume. The existing correction analysis reports an effective-correction L2 norm averaging 19.03 times that of the calibrated mean base volume. This finding indicates that the learned correction contributes substantially to the final structure. Mechanistic interpretation therefore requires more than visually comparing the input and final images.
+0310  
+0311  > **[E4：Fig. 5 消融待补]**在当前 mean anchor 下统一比较：去掉 mean 结构项；固定 mean loss 权重替代梯度上限；去 Taylor 分支；去 Set 分支；去 Gate。每项从相同初始化、同预算训练；报告分辨判据、体误差、连续性和稳定性。附实际梯度比例与 ramp 轨迹，避免仅用 loss 下降证明模块有效。**[E5]**增加多训练种子，将初始化变化与输入子集变化分开统计。
+0312  
+0313  ### 3.5. Experimental reconstruction of spinach roots
+0314  
+0315  An exploratory transfer result is available for a spinach-root acquisition. The same ten input frames were used to construct the mean and Taylor preliminary volumes and to evaluate the trained network. The remaining ninety frames supplied measurement-space statistics for an external consistency check. Relative to the Taylor-anchored network, the mean-anchored result reduced the reported mean/variance NRMSE values from 0.4001/0.7320 to 0.3721/0.6775, while the variance correlation increased from 0.6462 to 0.7080. These preliminary observations suggest improved statistical consistency of this transfer relative to the earlier network.
+0316  
+0317  The mean-only initialization nevertheless had lower corresponding mean/variance NRMSE values of 0.3399/0.6700. Furthermore, the acquisition record indicates upstream per-frame maximum normalization and conversion to 8-bit images. This processing changes the measurement statistics used by the forward constraints. The present transfer therefore does not establish improved experimental resolution, quantitative fluorescence recovery, or correct axial localization. It is retained as a feasibility observation that informs the calibrated biological validation.
+0318  
+0319  Figure 6 is reserved for the formal spinach-root experiment. The intended evaluation will compare the ten-frame reconstruction with matched low-frame and higher-frame traditional reconstructions and an independent volumetric reference. Tissue boundaries and elongated structures will be analyzed at fixed positions, with particular attention to false breaks and false connections. Results will be summarized at the level of independent roots, with fields of view and regions treated as nested measurements.
+0320  
+0321  > **[E6：正式结果待补]**填写独立根数、视野数、采集参数和参考成像；插入真实 XY/XZ/YZ、原生层局部放大、标定过的剖面与每根样本的散点。需明确回答：①10 帧保留了哪些 50/100 帧参考中可确认的细节；②这些细节是否优于同 10 帧传统方法；③是否新增断裂/假连接。当前预实验若因强度处理不适合主文，可移入补充，不能悄悄替换成“已验证高分辨”的结论。
+0322  
+0323  ### 3.6. Experimental reconstruction of mouse brain sections
+0324  
+0325  Mouse brain sections provide a complementary test of structural recovery in tissue with different spatial organization and fluorescence distributions. The experimental analysis will use **[actual label and brain region]** to define the features of interest. For nuclear labeling, the primary targets are adjacent-nucleus separation and depth assignment; for neuronal or vascular labeling, they are the continuity and separation of structures that can be independently verified at the calibrated resolution. Figure 7 will compare native sections and three-dimensional views across reconstruction methods and the independent reference.
+0326  
+0327  The evaluation will quantify whether reducing the measurement count preserves these features without generating false branches or transferring signal between depth planes. A fixed model or a clearly separated adaptation protocol will be used, with test animals or independently sourced tissues excluded from development. No claims about live neural dynamics follow from an experiment on fixed sections.
+0328  
+0329  > **[E7：本节实验尚未完成]**补入样本与伦理/来源信息、真实标记、切片厚度、动物/供体层级、独立参考及配准误差。结果句仅在采集后填写，至少同时报告空间细节、伪结构和深度串扰。若不同脑区/染色需分别微调，说明训练/测试边界和微调消耗的帧数；不能统称直接泛化。
+0330  
+0331  ### 3.7. Acquisition and computational cost
+0332  
+0333  The proposed inference pipeline includes calculation of the frame statistics, two preliminary RL reconstructions, network evaluation, and intensity calibration. For large experimental fields, any tiling, context handling, and stitching contribute to the total cost. Consequently, network-forward time alone is insufficient to characterize end-to-end reconstruction throughput. Figure 3 or a supplementary timing table will report these stages separately alongside the acquisition duration.
+0334  
+0335  At fixed exposure and switching conditions, reducing the number of measured frames can shorten the interval required for one volume. The achievable improvement depends on the overheads and on the number of frames needed to meet the same spatial-fidelity criterion. Photobleaching and dose reduction also require their own exposure-controlled measurements; they cannot be inferred from the training input/constraint split.
+0336  
+0337  > **[E8：端到端耗时待补]**记录采集、统计量、Mean-RL、Taylor-RL、网络前向、亮度校准和拼接时间，注明体尺寸、GPU、预热、重复次数及同步方式。分开报告训练成本和新样本推理成本。不得把“10 帧输入、90 帧约束”写成十倍实测速度或十倍低光毒性。
+0338  
+0339  ## 4. Discussion
+0340  
+0341  This study targets the trade-off between the number of speckle measurements and the spatial information retained in an LFM reconstruction. The present ten-frame results provide evidence that the learned reconstruction can recover neighboring chart features more consistently than the mean-derived initialization while improving volumetric shape and depth-distribution metrics. The principal intended advance is measurement-efficient recovery of fine structure. Establishing the size of that advance requires the matched-fidelity frame-budget evaluation, rather than a comparison of nominal frame counts.
+0342  
+0343  The mean anchor and statistical gradient design address complementary parts of this problem. The anchor supplies a reproducible initialization tied to the input mean, while the Taylor and frame-set features allow the decoder to use information absent from that initialization. The intensity/structure separation prevents the ordinary mean data term from directly changing the normalized shape. The additional mean-shape term reintroduces structural mean information with an explicit gradient bound. The current anchor comparison supports its aggregate benefit in this implementation, but does not isolate the necessity of every branch or establish a general optimality property. In particular, the substantial effective correction and the continuity errors motivate the proposed ablations and independent structural validation.
+0344  
+0345  The relationship to earlier work is also specific. Speckle-based blind-SIM and RIM already exploit unknown illumination patterns and their statistics; learning-based LFM and physics-driven self-supervision already provide alternatives to clean volumetric supervision. Recent unrolled blind-SIM further demonstrates learned physics-based reconstruction in the unknown-illumination setting. The contribution investigated here is their use within a mean-anchored, multi-statistic reconstruction for a short sequence of light-field measurements, with explicit control over mean and variance structural updates. A quantitative comparison with another method requires a compatible optical operator, input budget, and training protocol, rather than transferring reported resolution or runtime values from a different microscope. [3](https://doi.org/10.1038/nphoton.2012.83), [5](https://doi.org/10.1016/j.crmeth.2021.100009), [9](https://doi.org/10.1038/s41592-025-02698-z), [10](https://doi.org/10.1038/s41467-026-68693-w)
+0346  
+0347  Several limitations determine the current scope. First, a three-bar separation result does not itself establish performance beyond the optical diffraction limit, and neither bar width nor reconstruction-grid spacing is equivalent to PSF FWHM. Second, axial-distribution improvement is distinct from axial two-feature resolution; the current pair-separation results remain unsuccessful. Third, the squared-PSF variance approximation omits finite-speckle covariance terms and needs validation against illumination, noise, and PSF mismatch. Finally, the main comparison uses one training seed and three development test objects, and the available biological transfer lacks an independent three-dimensional reference. The pending experiments address these limitations directly.
+0348  
+0349  If the proposed method meets the same spatial-fidelity target with fewer exposures in independent simulations and biological specimens, its practical value will be a shorter acquisition window for a given level of structural detail. The spinach-root and mouse-brain experiments are designed to test this proposition on different tissue organizations while checking for false structures. Broader claims about phototoxicity, dynamic imaging, or transfer across microscopes will require additional evidence appropriate to those applications.
+0350  
+0351  ## 5. Conclusion
+0352  
+0353  We introduced a mean-anchored self-supervised method for volumetric reconstruction from ten speckle-illuminated light-field measurements. The method combines mean, variance-derived, and raw-frame features with separate intensity calibration and gradient-controlled structural constraints. Existing simulations show consistent separation of 4.49 µm equal-width bars and gaps and improved aggregate shape and depth-distribution errors relative to a Taylor-anchored network. These findings support ten-frame recovery of fine structure under the tested conditions. The validated acquisition-reduction factor, experimental spatial resolution, and performance in spinach roots and mouse brain sections remain to be established by the measurements identified in this draft.
+0354  
+0355  > **[投稿前替换末句]**用已完成 E1/E2/E6/E7 的量化结果和适用条件结束全文；若某项未完成，应缩小贡献范围而不是删除不利证据。
+0356  
+0357  ## Funding
+0358  
+0359  **[Funding agencies and grant numbers to be supplied and matched to the Prism submission records.]**
+0360  
+0361  ## Acknowledgments
+0362  
+0363  **[Actual contributions from sample providers, facilities, technical support, and other contributors to be supplied. Remove this section if inapplicable.]**
+0364  
+0365  ## Disclosures
+0366  
+0367  **[All authors to confirm the applicable competing-interest statement. Do not presume the absence of conflicts.]**
+0368  
+0369  ## Data availability
+0370  
+0371  **[State how the raw measurements, calibrated PSF, object/subset partitions, reconstruction inputs, model checkpoints, and analysis code can be accessed. Insert a functioning repository/DOI or an accurate access statement; availability is not yet asserted.]**
+0372  
+0373  ## References
+0374  
+0375  1. M. Broxton, L. Grosenick, S. Yang, et al., “Wave optics theory and 3-D deconvolution for the light field microscope,” **Opt. Express 21**, 25418–25439 (2013). [DOI](https://doi.org/10.1364/OE.21.025418).
+0376  2. Z. Lu et al., “Virtual-scanning light-field microscopy for robust snapshot high-resolution volumetric imaging,” **Nat. Methods 20**, 735–746 (2023). [DOI](https://doi.org/10.1038/s41592-023-01839-6).
+0377  3. E. Mudry, K. Belkebir, J. Girard, et al., “Structured illumination microscopy using unknown speckle patterns,” **Nat. Photonics 6**, 312–315 (2012). [DOI](https://doi.org/10.1038/nphoton.2012.83).
+0378  4. J. Idier, S. Labouesse, M. Allain, et al., “On the superresolution capacity of imagers using unknown speckle illuminations,” **IEEE Trans. Comput. Imaging 4**, 87–98 (2018). [DOI](https://doi.org/10.1109/TCI.2017.2771729).
+0379  5. T. Mangeat, S. Labouesse, M. Allain, et al., “Super-resolved live-cell imaging using random illumination microscopy,” **Cell Rep. Methods 1**, 100009 (2021). [DOI](https://doi.org/10.1016/j.crmeth.2021.100009).
+0380  6. Z. Wang, L. Zhu, H. Zhang, et al., “Real-time volumetric reconstruction of biological dynamics with light-field microscopy and deep learning,” **Nat. Methods 18**, 551–556 (2021). [DOI](https://doi.org/10.1038/s41592-021-01058-x).
+0381  7. N. Wagner, F. Beuttenmueller, N. Norlin, et al., “Deep learning-enhanced light-field imaging with continuous validation,” **Nat. Methods 18**, 557–563 (2021). [DOI](https://doi.org/10.1038/s41592-021-01136-0).
+0382  8. J. Lehtinen, J. Munkberg, J. Hasselgren, et al., “Noise2Noise: Learning image restoration without clean data,” in **Proceedings of the 35th International Conference on Machine Learning**, PMLR **80**, 2965–2974 (2018). [Proceedings](https://proceedings.mlr.press/v80/lehtinen18a.html).
+0383  9. Z. Lu, M. Jin, S. Chen, et al., “Physics-driven self-supervised learning for fast high-resolution robust 3D reconstruction of light-field microscopy,” **Nat. Methods 22**, 1545–1555 (2025). [DOI](https://doi.org/10.1038/s41592-025-02698-z).
+0384  10. Z. Burns, J. Zhao, A. Z. Sahan, et al., “High-speed blind structured illumination microscopy via unsupervised algorithm unrolling,” **Nat. Commun. 17**, 1967 (2026). [DOI](https://doi.org/10.1038/s41467-026-68693-w).
+0385  
+0386  ## Proposed figure captions — figures to be assembled
+0387  
+0388  **Fig. 1. Mean-anchored reconstruction from a short speckle sequence.** (a) Optical acquisition and the light-field forward operator. (b) Ten input frames and their corresponding mean/Taylor preliminary reconstructions. (c) Volumetric encoders, permutation-invariant frame-set branch, gated fusion, and nonnegative anchored output. (d) Intensity/structure separation and statistical training constraints derived from the other ninety frames. Training-only inputs and operations are distinguished from the ten-frame inference path. **[待制作；实机元件与参数需确认。]**
+0389  
+0390  **Fig. 2. Lateral feature recovery with ten input frames.** (a) Ground-truth three-bar chart and reconstructions obtained using the same input subset. (b) Native-plane profiles for equal-width bars and gaps of 6.735, 4.490, and 3.367 µm. (c) Separation outcomes across widths, orientations, and all ten subsets. (d) Experimental calibration at multiple depths **[E2 pending]**. Chart dimensions, peak-matching tolerances, and the valley criterion are specified separately from any measured optical resolution. **[当前源数据可用；需按统一显示规则制作。]**
+0391  
+0392  **Fig. 3. Spatial fidelity versus measurement budget.** Comparison of the ten-frame network with conventional reconstructions using different frame counts. Panels show spatial detail, volumetric error, structural specificity, and acquisition/complete-processing times. Fixed-per-frame-exposure and fixed-total-exposure results are presented separately. **[E1、E8 待完成；当前不可填入减帧或速度倍数。]**
+0393  
+0394  **Fig. 4. Three-dimensional reconstruction and local structural errors.** Ground truth and reconstructed native sections or projections for tubular, three-bar, and axial-pair objects. Insets illustrate preserved detail, false breaks, false connections, and unresolved axial pairs. Quantitative panels show object-level errors and native axial intensity profiles. **[已有源数据；E3 标定作为补充。]**
+0395  
+0396  **Fig. 5. Anchor comparison, ablation, and subset stability.** (a) Mean and Taylor output anchors under a common training budget. (b) Shape dispersion and pairwise axial differences across input subsets. (c) Mean-shape constraint and feature-branch ablations. (d) Actual mean/variance gradient ratios during training. **[锚点与稳定性已有；E4/E5 待补。]**
+0397  
+0398  **Fig. 6. Experimental reconstruction of spinach roots.** Overview of the specimen, matched native slices, fixed local profiles, and an independently acquired three-dimensional reference. Quantification is organized by independent root, including detail retention, structural continuity, and depth consistency. **[E6 正式实验待补；现有探索性迁移不能充当全部面板。]**
+0399  
+0400  **Fig. 7. Experimental reconstruction of mouse brain sections.** Matched reconstructions and independent-reference images of **[verified tissue structures and labeling]**, together with native axial views and quantitative analysis organized by independent animal or donor tissue. **[E7 待完成。]**
+0401  
+0402  ---
+0403  
+0404  **作者数据溯源说明（不属于投稿正文）：**本稿主网络为 `/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01_newbest/mean_anchor_e3_mean100/checkpoint_last.pt`，400 updates。Table 1 从该目录 `analysis/supplemental/t03_lines.csv` 按 `threshold_fraction=0.1`、方法、条宽和方向重新汇总；不是新增推理。Table 3 来自 `analysis/quality_summary.csv` 的 `object_macro`；局部指标来自 `analysis/supplemental/local_summary.csv`；稳定性来自 `analysis/stability_per_object.csv`；预实验来自 `spinach_root_transfer/REPORT_ZH.md`。当前稿只引用了已核实的十篇起始文献，正式文献综述仍需作者补全。本次没有启动新训练、采集或重建实验。

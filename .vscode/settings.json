@@ -1,0 +1,12 @@
+{
+  "remote.autoForwardPorts": true,
+  "remote.autoForwardPortsSource": "process",
+  "remote.portsAttributes": {
+    "6006": {
+      "label": "V5 Taylor vs Mean — 800 steps",
+      "protocol": "http",
+      "onAutoForward": "openBrowser",
+      "requireLocalPort": true
+    }
+  }
+}

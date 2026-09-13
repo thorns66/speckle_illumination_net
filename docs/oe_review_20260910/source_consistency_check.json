@@ -1,0 +1,10 @@
+{
+  "manuscript_sha256": "a01a6e442c67bc93637cc5708302a27ff359a6d2e625efd3867fda698817ff09",
+  "docx_sha256": "850c85bcefa948a6cee4789d7ecd6ddc66bb44a163ce129eb73533c081c90387",
+  "source_lines": 404,
+  "word_paragraphs": 264,
+  "editable_equations": 60,
+  "tables_total": 18,
+  "unmatched_long_text_fragments": [],
+  "packet_contains_previous_reviews": false
+}

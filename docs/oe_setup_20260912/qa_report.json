@@ -1,0 +1,39 @@
+{
+  "status": "pass",
+  "subsections": 5,
+  "display_equations": [
+    "16",
+    "17",
+    "18",
+    "19",
+    "20"
+  ],
+  "editable_math_expressions": 11,
+  "data_tables": 1,
+  "pdf_pages": 5,
+  "reference_added": 12,
+  "doi": "10.1109/TIP.2003.819861",
+  "checks": [
+    "All OOXML and relationships parse; ZIP integrity valid",
+    "Five numbered formulas continue Section 2",
+    "GT and subset subscripts and q-bar visually verified after rendering",
+    "Five-page layout visually inspected: no clipping or blank pages",
+    "Biological data, hardware parameters, independent validation and other pending experiments marked",
+    "Existing Introduction and Principle and method left unchanged"
+  ],
+  "boundary": "Draft experiment protocols with explicit placeholders; no unmeasured resolution, frame-reduction or biological outcomes asserted.",
+  "files": {
+    "docx": {
+      "bytes": 12472,
+      "sha256": "2bb6be2526ffa4427f12b8c3401ccec188e6a4cc9d1ea4deaa2e2302258868b1"
+    },
+    "pdf": {
+      "bytes": 174866,
+      "sha256": "fb38c5d68a4a8a020bc8b4dd903a6449e902eb4967f872134ec5530d2233c400"
+    },
+    "md": {
+      "bytes": 17099,
+      "sha256": "1e4ee6fba452c0d5fc90440ebad240401af9b2b6f5374b3c1e12c9d48ea42904"
+    }
+  }
+}

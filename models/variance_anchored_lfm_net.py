@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import torch
 import torch.nn.functional as F
 from torch import Tensor, nn
+from torch.utils.checkpoint import checkpoint
 
 from physics.lfm_operator import LFMOperator
 
@@ -125,8 +126,10 @@ class VarianceAnchoredLFMNet(nn.Module):
         use_set_branch: bool = True,
         use_gate: bool = True,
         use_network_refinement: bool = True,
+        activation_checkpoint_segments: bool = False,
     ) -> None:
         super().__init__()
+        self.activation_checkpoint_segments = bool(activation_checkpoint_segments)
         var_channels = tuple(int(v) for v in var_channels)
         mean_channels = tuple(int(v) for v in mean_channels)
         set_channels = tuple(int(v) for v in set_channels)
@@ -352,18 +355,31 @@ class VarianceAnchoredLFMNet(nn.Module):
 
         var_input = normalize_feature_input(padded_var, dims=(-3, -2, -1))
         mean_input = normalize_feature_input(padded_mean, dims=(-3, -2, -1))
+        use_segment_checkpoint = bool(
+            self.activation_checkpoint_segments and self.training and torch.is_grad_enabled()
+        )
+
+        def run(module: nn.Module, *inputs: Tensor):
+            if use_segment_checkpoint:
+                return checkpoint(
+                    module, *inputs, use_reentrant=False, preserve_rng_state=False
+                )
+            return module(*inputs)
+
         variance_features = (
-            self.var_encoder(var_input)
+            run(self.var_encoder, var_input)
             if self.use_variance_branch
             else self._zero_pyramid(padded_var, self.var_channels)
         )
         mean_features = (
-            self.mean_encoder(mean_input)
+            run(self.mean_encoder, mean_input)
             if self.use_mean_branch
             else self._zero_pyramid(padded_mean, self.mean_channels)
         )
         set_features = (
-            self.set_encoder(residual_frames, z_values_um) if self.use_set_branch else None
+            run(self.set_encoder, residual_frames, z_values_um)
+            if self.use_set_branch
+            else None
         )
         if self.use_role_separated_detail and self.detail_lowpass_auxiliary_features:
             mean_features = tuple(
@@ -375,14 +391,43 @@ class VarianceAnchoredLFMNet(nn.Module):
                     self._lowpass_lateral(feature, self.detail_lowpass_passes)
                     for feature in set_features
                 )  # type: ignore[assignment]
-        fused, gates, alphas = self.fusion(
-            variance_features,
-            mean_features,
-            set_features,
-            use_set=self.use_set_branch,
-            use_gate=self.use_gate,
-        )
-        residual = self.decoder(fused)
+        if use_segment_checkpoint:
+            flat_inputs = (*variance_features, *mean_features)
+            if set_features is not None:
+                flat_inputs = (*flat_inputs, *set_features)
+
+            def fuse_flat(*values: Tensor):
+                var = tuple(values[:3])
+                mean = tuple(values[3:6])
+                set_values = tuple(values[6:9]) if self.use_set_branch else None
+                fused_values, gate_values, alpha_values = self.fusion(
+                    var, mean, set_values,
+                    use_set=self.use_set_branch,
+                    use_gate=self.use_gate,
+                )
+                return (*fused_values, *gate_values, alpha_values)
+
+            flat_outputs = checkpoint(
+                fuse_flat, *flat_inputs, use_reentrant=False, preserve_rng_state=False
+            )
+            fused = tuple(flat_outputs[:3])
+            gates = tuple(flat_outputs[3:6])
+            alphas = flat_outputs[6]
+            residual = checkpoint(
+                lambda *values: self.decoder(tuple(values)),
+                *fused,
+                use_reentrant=False,
+                preserve_rng_state=False,
+            )
+        else:
+            fused, gates, alphas = self.fusion(
+                variance_features,
+                mean_features,
+                set_features,
+                use_set=self.use_set_branch,
+                use_gate=self.use_gate,
+            )
+            residual = self.decoder(fused)
         detail_residual: Tensor | None = None
         if self.use_role_separated_detail:
             assert self.detail_head is not None

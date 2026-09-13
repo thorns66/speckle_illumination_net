@@ -1,44 +1,90 @@
 {
-  "schema_version": 1,
-  "baseline_id": "e3_mean100_v3_400_20260908_run01",
-  "display_name": "E3＋100% mean 结构梯度上限",
+  "schema_version": 2,
+  "baseline_id": "mean100_v5_mean_anchor_mixed_real_no_p12_800_20260913",
+  "display_name": "Mean100：Mean-RL3主重建基础＋E3＋mean≤100%＋Set，final800",
   "status": "current",
-  "selection_authority": "user explicitly selected E3+100% as the new baseline",
+  "registered_on_beijing": "2026-09-13",
+  "selection_authority": "user explicitly promoted the current Mean100 final800 baseline",
   "default_checkpoint_role": "final",
+  "overall_analysis_root": "/workspace/xyx/speckle_illumination_net/outputs/mean100_baseline_analysis_20260913_run01",
+  "overall_analysis_report": "/workspace/xyx/speckle_illumination_net/outputs/mean100_baseline_analysis_20260913_run01/analysis/REPORT_ZH.md",
+  "overall_analysis_acceptance": "/workspace/xyx/speckle_illumination_net/outputs/mean100_baseline_analysis_20260913_run01/final_acceptance.json",
+  "reconstruction_anchor": "mean_rl3",
+  "use_set_branch": true,
+  "input_frames": 10,
+  "target_frames": 90,
+  "rl_iterations": 3,
+  "var_feature_representation": "sqrt",
   "checkpoints": {
     "final": {
-      "path": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01/e3_mean100/checkpoint_last.pt",
-      "step": 400,
-      "sha256": "f9e11f2611aed30272a3aeb3e75c2a442d0650e544599072dd0b4b0b15eb1aa0"
+      "path": "/workspace/xyx/speckle_illumination_net/outputs/v5_sim_real_no_p12_mean_anchor_e3_mean100_800_20260911_run01/mean_anchor_e3_mean100/checkpoint_step_000800.pt",
+      "step": 800,
+      "sha256": "ae61ff74cb40cc34dfeac0c221b13cdbfc6e4e9b84514e5282e3ea6ed7dafa03",
+      "identical_last_path": "/workspace/xyx/speckle_illumination_net/outputs/v5_sim_real_no_p12_mean_anchor_e3_mean100_800_20260911_run01/mean_anchor_e3_mean100/checkpoint_last.pt"
     },
     "best": {
-      "path": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01/e3_mean100/checkpoint_best.pt",
-      "step": 360,
-      "sha256": "fb4adf43c0dbeb42f40ef2c41e23cf4535cc8975aceb893cd3d9b23e01381746"
+      "path": "/workspace/xyx/speckle_illumination_net/outputs/v5_sim_real_no_p12_mean_anchor_e3_mean100_800_20260911_run01/mean_anchor_e3_mean100/checkpoint_best.pt",
+      "step": 740,
+      "sha256": "b3cefc504fe5d40ddd8ed98f1899f5163aee673ee00eea202692b3561c633b3d",
+      "role": "secondary_comparison_only"
     }
   },
   "config": {
-    "path": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01/e3_mean100.yaml",
-    "sha256": "fe6440c0cbae2cd2795e88b9865bfd91c9b78cbe56adfead75d9ab74581b6cba"
+    "path": "/workspace/xyx/speckle_illumination_net/outputs/v5_sim_real_no_p12_mean_anchor_e3_mean100_800_20260911_run01/mean_anchor_e3_mean100/config_used.yaml",
+    "sha256": "6ae4b650c49ac5a4ea008e140bef47e850a9ec7f674c56c34cdd85b6aa47706e"
   },
-  "dataset_root": "/workspace/xyx/speckle_illumination_net/data/speckle_dataset_v3_full_20260907_run01",
-  "dataset_fingerprint": "d2984a7ed7b98f6d693b7c7209ba6603595392dae26c13b89eee4e196a7c128c",
-  "experiment_output": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01",
-  "evaluation_root": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01/evaluation/e3_mean100",
-  "report": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01/REPORT_ZH.md",
-  "source_snapshot": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean050_mean100_400_20260908_run01/source_snapshot",
-  "adapter_module": "tools.mean_budget_experiment",
+  "dataset_root": "/workspace/xyx/speckle_illumination_net/outputs/v3_mean_anchor_e3_mean100_400_20260909_run01/dataset_v3_frozen_view",
+  "dataset_fingerprint": "39baf96b2c237102ebfe649ab8152938e4913f784023ad1250dcaba13d6f3f5e",
+  "dataset_fingerprint_scope": "mixed simulation and real manifest; recorded training fingerprint",
+  "real_manifest": {
+    "path": "/workspace/xyx/speckle_illumination_net/data/spinach_real_mixed_training_20260910_run01/final_manifest.json",
+    "sha256": "e9094830facf5dedbe132cd28c231a2de67d8609fa1e34f544ab538c18f8060f"
+  },
+  "training_data": {
+    "simulation_objects": ["P01", "P02", "P03", "P04", "P05", "P06", "P07", "P08", "P09", "P10", "P11"],
+    "real_fields": ["45", "55"],
+    "excluded_objects": ["P12"],
+    "candidate_subsets": 130,
+    "mixed_batch": {"simulation": 6, "field45": 1, "field55": 1},
+    "real_shape_yx": [1029, 1421],
+    "real_spatial_policy": "full field, no resizing or tiling",
+    "real_ground_truth": false
+  },
+  "validation_objects": ["V01", "V02", "V03"],
+  "test_objects": ["T02", "T03", "T04"],
+  "independent_real_test_fields": [],
+  "psf": {
+    "path": "/workspace/xyx/speckle_illumination_net/psf/NEW_modifyfobj_PSFmatrix_M4NA0.15MLPitch220fml4000OSR3chunk05from10to130zspacing14.6154Nnum49lambda532n1a0_-11b0_2.9333.mat",
+    "sha256": "229c522306bb0855a59fe165efef794aa3a3e487148d80214889a857f73ec0c1",
+    "hash_source": "frozen training preflight.json",
+    "z_values_um": [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+  },
+  "experiment_output": "/workspace/xyx/speckle_illumination_net/outputs/v5_sim_real_no_p12_mean_anchor_e3_mean100_800_20260911_run01",
+  "evaluation_root": "/workspace/xyx/speckle_illumination_net/outputs/spinach_v5_800_detailed_20260913_run02",
+  "evaluation_method_key": "mean800",
+  "report": "/workspace/xyx/speckle_illumination_net/outputs/spinach_v5_800_detailed_20260913_run02/REPORT_ZH.md",
+  "grouped_comparison": "/workspace/xyx/speckle_illumination_net/outputs/spinach_grouped_comparison_20260913_run01/README_ZH.md",
+  "source_snapshot": "/workspace/xyx/speckle_illumination_net/outputs/v5_sim_real_no_p12_mean_anchor_e3_mean100_800_20260911_run01/source_snapshot",
+  "adapter_module": "tools.v5_mixed_real_anchor_experiment",
+  "training_wrapper": "tools.queue_v5_taylor_then_mean_800",
+  "verified_real_inference_module": "tools.spinach_v5_800_detailed",
   "gradient_budget": 1.0,
   "coefficient_cap": 1.0,
   "ramp_steps": 50,
   "seed": 20260901,
-  "training_steps": 400,
+  "training_steps": 800,
   "global_batch_size": 8,
-  "historical_reference_output": "/workspace/xyx/speckle_illumination_net/outputs/v3_baseline_e3_mean005_400_20260908_run01",
+  "precision": "FP32; AMP and TF32 disabled",
+  "previous_baseline_id": "e3_mean100_v3_400_20260908_run01",
+  "previous_baseline_archive": "docs/baseline_history/e3_mean100_v3_400_20260908_run01.json",
+  "promotion_record": "docs/baseline_history/promotion_mean100_20260913.md",
   "notes": [
-    "Final step 400 is the default reference; best step 360 remains a separate secondary comparison.",
-    "100% is a per-sample gradient norm cap at q, not a fixed loss weight.",
-    "Use the E3 adapter and frozen config together; generic no_mean training does not reproduce this baseline.",
-    "Future from-scratch comparisons retain the shared random initialization; fine-tuning from this checkpoint must be labeled separately."
+    "Mean100 denotes the gradient budget, not 100 input frames; default is Mean-anchor final800, not best740 or Taylor800.",
+    "45/55 and their remaining 90-frame constraints are training diagnostics, not independent real tests.",
+    "The training-directory test_metrics.csv evaluates best740, not final800.",
+    "The legacy generic V5 validator expects 600 steps; use the verified 800-step wrapper and frozen sources for reproduction.",
+    "Inference must include Mean-specific beta, positive anchor mapping and full-field E3 brightness calibration.",
+    "From-scratch ablations retain shared initialization; continuing from this checkpoint must be labelled fine-tuning.",
+    "This registration does not modify historical experiments, launch jobs, commit/push Git, or acknowledge receipt by other Codex sessions."
   ]
 }

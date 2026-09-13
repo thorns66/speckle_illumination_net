@@ -1,0 +1,30 @@
+[
+  {
+    "name": "SeReNet",
+    "url": "https://github.com/kimchange/SeReNet",
+    "commit": "a7d4a27429efa904cfb45642527f94a88416d3c8",
+    "license_files": [],
+    "license_status": "no standalone license file in checked-out upstream source",
+    "model_sha256": {
+      "models.py": "ae735be0488df701e681bd1a209b9bdafc4ea74257062405a1a5344b4085e2f2",
+      "vcdnet.py": "1e0a12770975031911dc650b280b838e6245ccb0f1bdffccc79244eda154389f",
+      "serenetup5.py": "22a0deaee5e766c8faaa85ad25f65032530fd6531b4a759bda3f8ec7e1b0b342",
+      "fserenet.py": "7e98cd504c1abbf6ed73da719002f6c28200a4e245df0cc98a78139219969ecd",
+      "vsnet.py": "72e9f64e5c18be7a22621302f4d0a93fa2ba5b24224982d00bba26c6fe907b32",
+      "rlnet.py": "e6b06e33a663f7b13d2cfefe40f76737cb084cda97b151e2e3deee1f9d875b50",
+      "__init__.py": "6f776c2ea3beb28587d15d21bea2c18cbfa7840f7a4b7055c96d7f428a8a5ef4",
+      "serenet.py": "dac4dcef85682c123a177f36ead61d855ac502014c542958b15e2766d3392079",
+      "hylfmnet.py": "e7e4ba8236e4bc7400f082ac29d6fd6a0307a8464c3f2d48247166deee473172"
+    }
+  },
+  {
+    "name": "VCD-Net",
+    "url": "https://github.com/feilab-hust/VCD-Net",
+    "commit": "877ec8da80d4e91c25e57072947243d33779b4b9",
+    "license_files": [
+      "LICENSE",
+      "vcdnet/LICENSE"
+    ],
+    "license_status": "provided"
+  }
+]

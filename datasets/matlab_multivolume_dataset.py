@@ -73,8 +73,8 @@ def load_dataset_index(root: str | Path) -> tuple[dict[str, list[DatasetItemKey]
         raise ValueError("Dataset manifests do not declare a complete dataset")
     version = splits.get("version", 2)
     expected = expected_splits(version)
-    if version == 3 and final.get("version") != 3:
-        raise ValueError("V3 final and split manifest revisions disagree")
+    if version >= 3 and final.get("version") != version:
+        raise ValueError("Final and split manifest revisions disagree")
     final_map = {item["sample_id"]: item for item in final["samples"]}
     split_map = {item["sample_id"]: item for item in splits["samples"]}
     if len(final_map) != len(final["samples"]) or len(split_map) != len(splits["samples"]):
@@ -89,7 +89,7 @@ def load_dataset_index(root: str | Path) -> tuple[dict[str, list[DatasetItemKey]
         if split not in indexed:
             raise ValueError(f"Unsupported split {split!r} for {sample_id}")
         sample_dir = root / sample_id
-        if version == 3 and (
+        if version >= 3 and (
             final_map[sample_id]["split"] != split
             or item.get("object_group_id") != sample_id
             or Path(item["sample_dir"]).resolve() != sample_dir
@@ -104,7 +104,7 @@ def load_dataset_index(root: str | Path) -> tuple[dict[str, list[DatasetItemKey]
         validation_record = json.loads(validation.read_text(encoding="utf-8"))
         if not validation_record.get("complete"):
             raise ValueError(f"{sample_id} has not passed MATLAB validation")
-        if version == 3 and (
+        if version >= 3 and (
             validation_record.get("sample_id") != sample_id
             or validation_record.get("frame_count") != 100
             or validation_record.get("subset_count") != 10
@@ -119,7 +119,7 @@ def load_dataset_index(root: str | Path) -> tuple[dict[str, list[DatasetItemKey]
             signature_paths.append(subset_path)
             indexed[split].append(DatasetItemKey(sample_id, subset_index, split, sample_dir))
         frame_paths = sorted((sample_dir / "sensor_frames").glob("frame_*.mat"))
-        if version == 3 and [p.name for p in frame_paths] != [f"frame_{i:03d}.mat" for i in range(1, 101)]:
+        if version >= 3 and [p.name for p in frame_paths] != [f"frame_{i:03d}.mat" for i in range(1, 101)]:
             raise ValueError(f"{sample_id} lacks its exact 100-frame inventory")
         signature_paths.extend(frame_paths)
     for split, objects in expected.items():

@@ -1,0 +1,5 @@
+{
+  "R1": "Primary emphasis is technical soundness of the forward model, training/inference protocol, evaluation design and reproducibility. Still assess all common axes.",
+  "R2": "Primary emphasis is originality, significance and the evidence linking the proposed method to the intended fewer-measurement and fine-detail contribution. Still assess all common axes.",
+  "R3": "Primary emphasis is experimental application, interested readership, biological-validation interpretation and clarity of the manuscript evidence chain. Still assess all common axes."
+}
